@@ -317,6 +317,20 @@ textarea{min-height:74px;resize:vertical}
   font-weight:650;text-decoration:none;
 }
 .muted{font-size:13px;opacity:.7;line-height:1.5}
+
+/* ---------- dad link ---------- */
+.dadwrap{display:flex;justify-content:center;margin:22px 0 4px}
+a.dad{
+  display:inline-flex;align-items:center;gap:10px;text-decoration:none;
+  min-height:52px;padding:0 30px;border-radius:999px;
+  background:linear-gradient(180deg,var(--gold),#b8781f);
+  color:#32200e;font-weight:800;font-size:16px;letter-spacing:.18em;
+  border:1px solid #8f5f1c;
+  box-shadow:0 3px 0 #7d5217, 0 10px 26px rgba(15,8,3,.45);
+  transition:transform .08s ease, box-shadow .08s ease;
+}
+a.dad:active{transform:translateY(3px);box-shadow:0 0 0 #7d5217, 0 6px 16px rgba(15,8,3,.4)}
+a.dad .cupicon{font-size:19px;letter-spacing:0}
 .hyg-info a,.muted a,.pop a{color:var(--cocoa);font-weight:650}
 footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;padding:10px 0 0;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -389,6 +403,10 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
       <div class="ab-s">Name, location and the nine grades — it drops straight into the list and onto the map.</div>
     </div>
     <button class="btn primary big" id="addBtn2">+ Add a coffee shop</button>
+  </div>
+
+  <div class="dadwrap">
+    <a class="dad" href="https://stuartmcneil.github.io/window/" target="_blank" rel="noopener"><span class="cupicon">☕</span>DAD</a>
   </div>
 
   <footer class="foot">Izzies Coffee Shops · scores are the mean of nine categories · map tiles © OpenStreetMap contributors</footer>
