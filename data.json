@@ -1,7 +1,7 @@
 {
   "version": 1,
   "title": "Izzies Coffee Shops",
-  "updated": "2026-09-01T00:00:00Z",
+  "updated": "2026-09-01T12:00:00Z",
   "shops": [
     {
       "id": "asda-croyton",
@@ -22,7 +22,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "969277",
+        "rating": "4",
+        "date": "2025-06-25",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 10,
+          "structural": 5,
+          "confidence": 0
+        },
+        "matchedName": "Eurest @ Asda",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "coffee-club-whitchurch",
@@ -43,7 +57,9 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": null
     },
     {
       "id": "coffee-no-1-whitchurch",
@@ -64,7 +80,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1200837",
+        "rating": "5",
+        "date": "2024-08-22",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 0,
+          "structural": 5,
+          "confidence": 0
+        },
+        "matchedName": "Coffee#1",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "ground",
@@ -85,7 +115,9 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": null
     },
     {
       "id": "fino-lounge",
@@ -106,7 +138,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "969284",
+        "rating": "5",
+        "date": "2026-02-25",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 5,
+          "confidence": 0
+        },
+        "matchedName": "Fino Lounge Cafe/Bar",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "against-the-grain",
@@ -127,7 +173,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1492976",
+        "rating": "5",
+        "date": "2025-11-14",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 0,
+          "structural": 0,
+          "confidence": 0
+        },
+        "matchedName": "Against The Grain Coffee House LTD",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "pink-kiwi",
@@ -148,7 +208,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1320642",
+        "rating": "3",
+        "date": "2026-06-19",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 10,
+          "structural": 10,
+          "confidence": 5
+        },
+        "matchedName": "Pink Kiwi",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "blossom",
@@ -169,7 +243,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1174574",
+        "rating": "5",
+        "date": "2025-08-15",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 0,
+          "confidence": 5
+        },
+        "matchedName": "Blossom",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "wellfield-social",
@@ -190,7 +278,21 @@
       },
       "comments": "12.6",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1738733",
+        "rating": "4",
+        "date": "2026-03-24",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 5,
+          "confidence": 10
+        },
+        "matchedName": "The Wellfield Social",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "the-coffi-house",
@@ -211,7 +313,21 @@
       },
       "comments": "11.3",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1949044",
+        "rating": "AwaitingInspection",
+        "date": null,
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": null,
+          "structural": null,
+          "confidence": null
+        },
+        "matchedName": "The coffi house",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "bentleys-cafe",
@@ -232,7 +348,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1269190",
+        "rating": "5",
+        "date": "2026-05-01",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 0,
+          "confidence": 0
+        },
+        "matchedName": "Bentley's Cafe Ltd",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "ty-melin-bakery",
@@ -253,7 +383,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1419414",
+        "rating": "5",
+        "date": "2023-09-07",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 0,
+          "structural": 0,
+          "confidence": 0
+        },
+        "matchedName": "Ty Melin Bakery",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "a-head-of-the-game",
@@ -274,7 +418,21 @@
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1837642",
+        "rating": "5",
+        "date": "2025-07-18",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 5,
+          "confidence": 5
+        },
+        "matchedName": "A-Head of the Game Nutrition",
+        "fetched": "2026-09-01"
+      }
     }
   ]
 }

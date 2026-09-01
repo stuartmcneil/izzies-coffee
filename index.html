@@ -243,6 +243,65 @@ textarea{min-height:74px;resize:vertical}
   box-shadow:0 8px 26px rgba(0,0,0,.35);max-width:92vw;text-align:center}
 .toast[hidden]{display:none}
 .empty{padding:28px 16px;text-align:center;opacity:.6;font-size:14px}
+
+/* ---------- add bar ---------- */
+.addbar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;margin-bottom:16px;
+  border-radius:var(--radius);border:1px dashed rgba(107,68,41,.4);
+  background:linear-gradient(160deg,#fffaf1,#f6e6cd);box-shadow:var(--shadow);
+}
+.addbar .ab-t{font-weight:750;font-size:15px}
+.addbar .ab-s{font-size:12.5px;opacity:.68;margin-top:2px}
+.addbar .big{min-height:46px;font-size:15px;padding:0 20px}
+
+/* ---------- detail card ---------- */
+.modal.wide{max-width:720px}
+.dt-head{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.dt-big{
+  width:78px;height:78px;border-radius:20px;flex:0 0 auto;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:linear-gradient(165deg,var(--gold),#b8781f);
+  color:#32200e;border:1px solid #a9713a;
+}
+.dt-big b{font-size:27px;line-height:1;letter-spacing:-.5px}
+.dt-big span{font-size:10px;letter-spacing:.1em;opacity:.75;margin-top:3px}
+.dt-meta{flex:1 1 200px;min-width:0}
+.dt-meta h4{margin:0 0 3px;font-size:20px;overflow-wrap:anywhere}
+.dt-meta .a{font-size:13px;opacity:.7;overflow-wrap:anywhere}
+.dt-meta .r{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
+.sect{margin-top:18px}
+.sect > h5{
+  margin:0 0 10px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cocoa);
+  display:flex;align-items:center;gap:8px;
+}
+.sect > h5 .r{margin-left:auto}
+.hyg{display:flex;gap:13px;align-items:center;flex-wrap:wrap}
+.hyg-badge{
+  flex:0 0 auto;width:86px;height:60px;border-radius:11px;background:#0b6b3a;color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #044926;
+}
+.hyg-badge b{font-size:26px;line-height:1}
+.hyg-badge span{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.9}
+.hyg-badge.r4{background:#3d8b3d;border-color:#2c6a2c}
+.hyg-badge.r3{background:#8a8f2f;border-color:#6a6e22}
+.hyg-badge.r2{background:#b8792a;border-color:#8d5c1e}
+.hyg-badge.r1{background:#a8482c;border-color:#83341c}
+.hyg-badge.r0{background:#8c2f22;border-color:#661f15}
+.hyg-badge.na{background:#6b5b4b;border-color:#4c3f33}
+.hyg-info{font-size:13px;line-height:1.5;flex:1 1 180px}
+.hyg-info .sub{opacity:.7;font-size:12px}
+.stars{color:#c98a3c;letter-spacing:1px;font-size:15px}
+.rev{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;background:var(--cream)}
+.rev .rh{display:flex;gap:8px;align-items:baseline;font-size:12.5px;opacity:.75;margin-bottom:5px;flex-wrap:wrap}
+.rev .rh b{font-size:13.5px;opacity:1;color:var(--espresso)}
+.rev p{margin:0;font-size:13.5px;line-height:1.5;overflow-wrap:anywhere}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap}
+.linkrow a{
+  display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;
+  border:1px solid var(--line-strong);background:var(--paper);color:var(--mocha);font-size:13.5px;
+  font-weight:650;text-decoration:none;
+}
+.muted{font-size:13px;opacity:.7;line-height:1.5}
+.hyg-info a,.muted a,.pop a{color:var(--cocoa);font-weight:650}
 footer.foot{text-align:center;font-size:12px;color:var(--mocha);opacity:.7;padding:6px 0 0}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
@@ -288,6 +347,14 @@ footer.foot{text-align:center;font-size:12px;color:var(--mocha);opacity:.7;paddi
     <button class="btn sm" id="sortDir" title="Toggle sort direction">↓ High first</button>
     <span class="grow"></span>
     <button class="btn sm" id="mapToggle">🗺 Hide map</button>
+  </div>
+
+  <div class="addbar">
+    <div style="flex:1 1 220px">
+      <div class="ab-t">☕ Been somewhere new?</div>
+      <div class="ab-s">Name, location and the nine grades — it drops straight into the list and onto the map.</div>
+    </div>
+    <button class="btn primary big" id="addBtn2">+ Add a coffee shop</button>
   </div>
 
   <section class="panel" id="mapPanel">
@@ -353,6 +420,20 @@ footer.foot{text-align:center;font-size:12px;color:var(--mocha);opacity:.7;paddi
   </div>
 </div>
 
+<!-- ============ detail modal ============ -->
+<div class="backdrop" id="detailBack" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="dtTitle">
+    <h3 id="dtTitle">☕ Shop <button class="x" data-close="detailBack" aria-label="Close">✕</button></h3>
+    <div class="body" id="detailBody"></div>
+    <div class="foot">
+      <button class="btn primary" id="dtEdit">✎ Edit grades</button>
+      <button class="btn" id="dtMap">📍 Show on map</button>
+      <span class="grow"></span>
+      <button class="btn" data-close="detailBack">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ settings modal ============ -->
 <div class="backdrop" id="setBack" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
@@ -376,6 +457,13 @@ footer.foot{text-align:center;font-size:12px;color:var(--mocha);opacity:.7;paddi
         <button class="btn" id="gPull">⬇︎ Load from GitHub</button>
         <button class="btn" id="gPush">⬆︎ Save to GitHub now</button>
       </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+      <div class="field">
+        <label class="f" for="gMaps">Google Places API key <span style="text-transform:none;letter-spacing:0;font-weight:500;opacity:.7">— optional</span></label>
+        <input type="password" id="gMaps" placeholder="AIza…" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="hint">Lets each shop card show its live Google rating and a few recent reviews. Create one in the Google Cloud console with the <b>Places API (New)</b> enabled, then restrict it to your Pages URL under <i>Website restrictions</i>. Stored only in this browser — never written to the repo. Leave blank and the cards just show search links instead.</div>
+      </div>
+
       <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
       <p class="hint" style="margin-top:0">Backups, in case you ever want the data out.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -413,7 +501,7 @@ const CRITERIA = [
 const SEED = {
   "version": 1,
   "title": "Izzies Coffee Shops",
-  "updated": "2026-09-01T00:00:00Z",
+  "updated": "2026-09-01T12:00:00Z",
   "shops": [
     {
       "id": "asda-croyton",
@@ -434,7 +522,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "969277",
+        "rating": "4",
+        "date": "2025-06-25",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 10,
+          "structural": 5,
+          "confidence": 0
+        },
+        "matchedName": "Eurest @ Asda",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "coffee-club-whitchurch",
@@ -455,7 +557,9 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": null
     },
     {
       "id": "coffee-no-1-whitchurch",
@@ -476,7 +580,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1200837",
+        "rating": "5",
+        "date": "2024-08-22",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 0,
+          "structural": 5,
+          "confidence": 0
+        },
+        "matchedName": "Coffee#1",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "ground",
@@ -497,7 +615,9 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": null
     },
     {
       "id": "fino-lounge",
@@ -518,7 +638,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "969284",
+        "rating": "5",
+        "date": "2026-02-25",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 5,
+          "confidence": 0
+        },
+        "matchedName": "Fino Lounge Cafe/Bar",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "against-the-grain",
@@ -539,7 +673,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1492976",
+        "rating": "5",
+        "date": "2025-11-14",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 0,
+          "structural": 0,
+          "confidence": 0
+        },
+        "matchedName": "Against The Grain Coffee House LTD",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "pink-kiwi",
@@ -560,7 +708,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1320642",
+        "rating": "3",
+        "date": "2026-06-19",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 10,
+          "structural": 10,
+          "confidence": 5
+        },
+        "matchedName": "Pink Kiwi",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "blossom",
@@ -581,7 +743,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1174574",
+        "rating": "5",
+        "date": "2025-08-15",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 0,
+          "confidence": 5
+        },
+        "matchedName": "Blossom",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "wellfield-social",
@@ -602,7 +778,21 @@ const SEED = {
       },
       "comments": "12.6",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1738733",
+        "rating": "4",
+        "date": "2026-03-24",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 5,
+          "confidence": 10
+        },
+        "matchedName": "The Wellfield Social",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "the-coffi-house",
@@ -623,7 +813,21 @@ const SEED = {
       },
       "comments": "11.3",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1949044",
+        "rating": "AwaitingInspection",
+        "date": null,
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": null,
+          "structural": null,
+          "confidence": null
+        },
+        "matchedName": "The coffi house",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "bentleys-cafe",
@@ -644,7 +848,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1269190",
+        "rating": "5",
+        "date": "2026-05-01",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 0,
+          "confidence": 0
+        },
+        "matchedName": "Bentley's Cafe Ltd",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "ty-melin-bakery",
@@ -665,7 +883,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1419414",
+        "rating": "5",
+        "date": "2023-09-07",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 0,
+          "structural": 0,
+          "confidence": 0
+        },
+        "matchedName": "Ty Melin Bakery",
+        "fetched": "2026-09-01"
+      }
     },
     {
       "id": "a-head-of-the-game",
@@ -686,7 +918,21 @@ const SEED = {
       },
       "comments": "",
       "visited": "",
-      "added": "2026-09-01"
+      "added": "2026-09-01",
+      "google": null,
+      "fsa": {
+        "id": "1837642",
+        "rating": "5",
+        "date": "2025-07-18",
+        "authority": "Cardiff",
+        "scores": {
+          "hygiene": 5,
+          "structural": 5,
+          "confidence": 5
+        },
+        "matchedName": "A-Head of the Game Nutrition",
+        "fetched": "2026-09-01"
+      }
     }
   ]
 };
@@ -696,7 +942,7 @@ const LS_UI   = 'izzies.ui.v1';
 
 /* ---------- state ---------- */
 let data = {version:1, title:'Izzies Coffee Shops', updated:null, shops:[]};
-let cfg  = {owner:'', repo:'', branch:'main', path:'data.json', token:''};
+let cfg  = {owner:'', repo:'', branch:'main', path:'data.json', token:'', mapsKey:''};
 let ui   = {sortBy:'overall', dir:'desc', mapOpen:true, expanded:{}};
 let remoteSha = null, dirty = false, saveTimer = null, editingId = null;
 let map, markerLayer, pickMap, pickMarker, pickLL = null;
@@ -795,7 +1041,7 @@ async function push(quiet){
   try{
     const body = {
       message: 'Update coffee shop data ('+data.shops.length+' shops)',
-      content: b64encode(JSON.stringify(data, null, 2)),
+      content: b64encode(JSON.stringify(forRepo(), null, 2)),
       branch: cfg.branch || 'main'
     };
     if (remoteSha) body.sha = remoteSha;
@@ -821,6 +1067,12 @@ async function push(quiet){
 }
 
 /* ---------- data shaping ---------- */
+function forRepo(){
+  const c = JSON.parse(JSON.stringify(data));
+  c.shops.forEach(s => { if (s.google) delete s.google.reviews; });
+  return c;
+}
+
 function normalise(d){
   const out = {version:1, title:'Izzies Coffee Shops', updated:d.updated||null, shops:[]};
   out.shops = (d.shops||[]).map(s => ({
@@ -831,9 +1083,106 @@ function normalise(d){
     lng: (typeof s.lng === 'number') ? s.lng : null,
     scores: CRITERIA.reduce((o,c) => (o[c.key] = (typeof s.scores?.[c.key] === 'number' ? s.scores[c.key] : null), o), {}),
     comments: s.comments || '',
-    added: s.added || ''
+    added: s.added || '',
+    fsa: s.fsa || null,
+    google: s.google || null
   }));
   return out;
+}
+
+/* ---------- food hygiene (Food Standards Agency, free, no key) ---------- */
+const FSA_LABEL = {'5':'Very good','4':'Good','3':'Generally satisfactory','2':'Improvement necessary','1':'Major improvement necessary','0':'Urgent improvement necessary'};
+function fsaClass(r){ return /^[0-5]$/.test(String(r)) ? 'r'+r : 'na'; }
+function fsaText(r){
+  if (/^[0-5]$/.test(String(r))) return FSA_LABEL[String(r)];
+  if (r === 'AwaitingInspection') return 'Awaiting its first inspection';
+  if (r === 'Exempt') return 'Exempt from the scheme';
+  return 'Not rated';
+}
+async function fsaLookup(shop){
+  const el = $('#fsaBox'); if (el) el.innerHTML = '<div class="muted">Asking the Food Standards Agency…</div>';
+  const postcode = (shop.address.match(/[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}/i) || [''])[0];
+  const tries = [];
+  if (shop.lat != null) tries.push(`longitude=${shop.lng}&latitude=${shop.lat}&maxDistanceLimit=1&name=${encodeURIComponent(shop.name)}&pageSize=8&sortOptionKey=distance`);
+  tries.push(`name=${encodeURIComponent(shop.name)}&address=${encodeURIComponent(postcode || shop.address || 'Cardiff')}&pageSize=8`);
+  tries.push(`name=${encodeURIComponent(shop.name.split(/[,(]/)[0].trim())}&address=${encodeURIComponent(postcode || 'Cardiff')}&pageSize=8`);
+  for (const q of tries){
+    try{
+      const r = await fetch('https://api.ratings.food.gov.uk/Establishments?'+q, {headers:{'x-api-version':'2','Accept':'application/json'}});
+      if (!r.ok) continue;
+      const j = await r.json();
+      const e = (j.establishments || [])[0];
+      if (!e) continue;
+      shop.fsa = {
+        id: String(e.FHRSID),
+        rating: String(e.RatingValue),
+        date: e.RatingDate ? String(e.RatingDate).slice(0,10) : null,
+        authority: e.LocalAuthorityName || null,
+        scores: {
+          hygiene: e.scores ? e.scores.Hygiene : null,
+          structural: e.scores ? e.scores.Structural : null,
+          confidence: e.scores ? e.scores.ConfidenceInManagement : null
+        },
+        matchedName: e.BusinessName || null,
+        fetched: new Date().toISOString().slice(0,10)
+      };
+      markDirty(); renderDetail(shop.id); toast('Hygiene rating updated');
+      return;
+    }catch(err){ /* try the next query */ }
+  }
+  if (el) el.innerHTML = `<div class="muted">Couldn’t reach the Food Standards Agency from this browser. <a href="https://ratings.food.gov.uk/search?searchTerm=${encodeURIComponent(shop.name+' '+(shop.address||''))}" target="_blank" rel="noopener">Look it up on ratings.food.gov.uk</a> instead.</div>`;
+}
+
+/* ---------- google places (optional, needs the user's own key) ---------- */
+async function googleLookup(shop){
+  const el = $('#gWrap');
+  if (!cfg.mapsKey){ if (el) el.innerHTML = ''; return; }
+  if (el) el.innerHTML = '<div class="muted">Asking Google…</div>';
+  try{
+    const body = {textQuery: shop.name + ' ' + (shop.address || ''), maxResultCount: 1};
+    if (shop.lat != null) body.locationBias = {circle:{center:{latitude:shop.lat, longitude:shop.lng}, radius:400}};
+    const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Goog-Api-Key': cfg.mapsKey,
+        'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.googleMapsUri,places.reviews'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok){
+      const t = await r.text().catch(()=> '');
+      throw new Error(r.status + ' ' + t.slice(0,140));
+    }
+    const j = await r.json();
+    const p = (j.places || [])[0];
+    if (!p){ if (el) el.innerHTML = '<div class="muted">Google has no match for this one.</div>'; return; }
+    shop.google = {
+      placeId: p.id || null,
+      name: p.displayName ? p.displayName.text : null,
+      rating: typeof p.rating === 'number' ? p.rating : null,
+      count: p.userRatingCount || 0,
+      uri: p.googleMapsUri || null,
+      reviews: (p.reviews || []).slice(0,3).map(v => ({
+        author: v.authorAttribution ? v.authorAttribution.displayName : 'Google user',
+        rating: v.rating || null,
+        when: v.relativePublishTimeDescription || '',
+        text: v.text ? v.text.text : (v.originalText ? v.originalText.text : '')
+      })),
+      fetched: new Date().toISOString().slice(0,10)
+    };
+    markDirty(); renderDetail(shop.id);
+  }catch(e){
+    if (el) el.innerHTML = `<div class="muted">Google lookup failed (${esc(e.message)}). Check the key is enabled for <b>Places API (New)</b> and that this site is allowed under its website restrictions.</div>`;
+  }
+}
+function stars(n){
+  const full = Math.round(n || 0);
+  return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5-full);
+}
+function daysSince(iso){
+  if (!iso) return Infinity;
+  return (Date.now() - Date.parse(iso)) / 86400000;
 }
 
 /* ---------- sorting ---------- */
@@ -899,30 +1248,136 @@ function renderList(){
 
   $('#list').innerHTML = arr.map((s, i) => {
     const rank = ranked.indexOf(s.id) + 1;
-    const open = !!ui.expanded[s.id];
     const bars = CRITERIA.map(c => `<i style="height:${((s.scores[c.key]||0)/5)*100}%" title="${esc(c.label)}: ${s.scores[c.key]??'–'}"></i>`).join('');
-    const detail = open ? `<div class="detail">
-        <div class="detail-grid">${CRITERIA.map(c => `<div class="crit"><span class="cl">${esc(c.label)}</span><span class="meter"><i style="width:${((s.scores[c.key]||0)/5)*100}%"></i></span><span class="cv">${s.scores[c.key]??'–'}</span></div>`).join('')}</div>
-        ${s.comments ? `<div class="note">${esc(s.comments)}</div>` : ''}
-      </div>` : '';
-    return `<div class="row" data-id="${esc(s.id)}" ${manual?'draggable="true"':''}>
+    const hyg = s.fsa && /^[0-5]$/.test(String(s.fsa.rating))
+      ? `<span class="chip" title="Food hygiene rating">🧼 ${esc(s.fsa.rating)}/5</span>` : '';
+    const goo = s.google && s.google.rating
+      ? `<span class="chip" title="Google rating">G ${s.google.rating.toFixed(1)}</span>` : '';
+    return `<div class="row" data-id="${esc(s.id)}" ${manual?'draggable="true"':''} role="button" tabindex="0">
       <div class="rank ${rank<=3?'top':''}">${rank}</div>
       <div>
         <div class="rname">${esc(s.name)}</div>
         <div class="raddr">${s.address ? esc(s.address) : ''}${(s.lat==null?`<span class="nogeo">${s.address?' · ':''}no map pin yet</span>`:'')}</div>
+        ${(hyg||goo) ? `<div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap">${hyg}${goo}</div>` : ''}
       </div>
       <div class="score">${fmt(overall(s))}<small>OVERALL</small></div>
       <div class="bars">${bars}</div>
       <div class="rowacts">
         ${manual ? `<button class="icon-btn" data-act="up" ${i===0?'disabled':''} aria-label="Move up">↑</button>
                     <button class="icon-btn" data-act="down" ${i===arr.length-1?'disabled':''} aria-label="Move down">↓</button>` : ''}
-        <button class="icon-btn" data-act="toggle" aria-label="Show details">${open?'▴':'▾'}</button>
+        <button class="icon-btn" data-act="detail" aria-label="Open details">ⓘ</button>
         <button class="icon-btn" data-act="edit" aria-label="Edit">✎</button>
         <button class="icon-btn" data-act="locate" aria-label="Show on map" ${s.lat==null?'disabled':''}>📍</button>
       </div>
-      ${detail}
     </div>`;
   }).join('');
+}
+
+/* ---------- detail card ---------- */
+let detailId = null;
+function openDetail(id){
+  detailId = id;
+  $('#detailBack').hidden = false;
+  document.body.style.overflow = 'hidden';
+  renderDetail(id);
+  const s = data.shops.find(x => x.id === id);
+  // refresh anything missing or stale (Google's terms ask that place data isn't cached beyond 30 days)
+  if (s && cfg.mapsKey && (!s.google || !s.google.reviews || daysSince(s.google.fetched) > 30)) googleLookup(s);
+}
+function renderDetail(id){
+  if (id !== detailId) return;
+  const s = data.shops.find(x => x.id === id);
+  if (!s){ closeModal('detailBack'); return; }
+  const rank = rankOrder().indexOf(s.id) + 1;
+  const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
+  const q = encodeURIComponent(s.name + ' ' + (s.address || 'Cardiff'));
+
+  /* hygiene block */
+  let hyg;
+  if (s.fsa){
+    const sub = s.fsa.scores || {};
+    const subLine = [['Hygiene',sub.hygiene],['Structural',sub.structural],['Confidence in management',sub.confidence]]
+      .filter(x => typeof x[1] === 'number')
+      .map(x => `${x[0]} ${x[1]}`).join(' · ');
+    hyg = `<div class="hyg">
+      <div class="hyg-badge ${fsaClass(s.fsa.rating)}"><b>${/^[0-5]$/.test(String(s.fsa.rating))?esc(s.fsa.rating):'—'}</b><span>${/^[0-5]$/.test(String(s.fsa.rating))?'out of 5':'no rating'}</span></div>
+      <div class="hyg-info">
+        <b>${esc(fsaText(s.fsa.rating))}</b><br>
+        <span class="sub">${s.fsa.matchedName ? esc(s.fsa.matchedName)+' · ' : ''}${s.fsa.authority ? esc(s.fsa.authority)+' council' : ''}${s.fsa.date ? ' · inspected '+esc(s.fsa.date) : ''}</span>
+        ${subLine ? `<br><span class="sub">${esc(subLine)} (lower is better)</span>` : ''}
+        ${s.fsa.id ? `<br><a href="https://ratings.food.gov.uk/business/${esc(s.fsa.id)}" target="_blank" rel="noopener">View on the FSA site</a>` : ''}
+      </div>
+    </div>`;
+  } else {
+    hyg = `<div class="muted">No hygiene rating saved yet. Tap <b>Check</b> to ask the Food Standards Agency.</div>`;
+  }
+
+  /* google block */
+  let goo;
+  if (s.google && s.google.rating){
+    const g = s.google;
+    goo = `<div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:10px">
+        <span class="stars">${stars(g.rating)}</span>
+        <b>${g.rating.toFixed(1)}</b>
+        <span class="muted">from ${g.count.toLocaleString()} Google reviews${g.fetched ? ' · checked '+esc(g.fetched) : ''}</span>
+      </div>
+      ${(g.reviews||[]).map(v => `<div class="rev">
+        <div class="rh"><b>${esc(v.author)}</b><span class="stars">${stars(v.rating)}</span><span>${esc(v.when)}</span></div>
+        <p>${esc(v.text).slice(0,420)}${(v.text||'').length>420?'…':''}</p>
+      </div>`).join('')}
+      ${g.uri ? `<a class="btn sm" href="${esc(g.uri)}" target="_blank" rel="noopener">All reviews on Google Maps →</a>` : ''}`;
+  } else if (cfg.mapsKey){
+    goo = `<div class="muted">Nothing saved yet — tap <b>Refresh</b> to pull the current Google rating.</div>`;
+  } else {
+    goo = `<div class="muted">Add a Google Places API key in <b>⚙︎ Sync</b> and the live rating and recent reviews appear here. Until then, the links below are one tap away.</div>`;
+  }
+
+  $('#dtTitle').firstChild.nodeValue = medal + ' ' + s.name + ' ';
+  $('#detailBody').innerHTML = `
+    <div class="dt-head">
+      <div class="dt-big"><b>${fmt(overall(s))}</b><span>OVERALL</span></div>
+      <div class="dt-meta">
+        <h4>${esc(s.name)}</h4>
+        <div class="a">${esc(s.address || 'No address saved yet')}</div>
+        <div class="r">
+          <span class="chip">Ranked ${rank} of ${data.shops.length}</span>
+          ${s.added ? `<span class="chip">Added ${esc(s.added)}</span>` : ''}
+          ${s.fsa && /^[0-5]$/.test(String(s.fsa.rating)) ? `<span class="chip">🧼 Hygiene ${esc(s.fsa.rating)}/5</span>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h5>Your grading</h5>
+      <div class="detail-grid">
+        ${CRITERIA.map(c => `<div class="crit"><span class="cl">${esc(c.label)}</span><span class="meter"><i style="width:${((s.scores[c.key]||0)/5)*100}%"></i></span><span class="cv">${s.scores[c.key]??'–'}</span></div>`).join('')}
+      </div>
+      ${s.comments ? `<div class="note">${esc(s.comments)}</div>` : ''}
+    </div>
+
+    <div class="sect">
+      <h5>Food hygiene rating <span class="r"><button class="btn sm" id="fsaBtn">${s.fsa?'Re-check':'Check'}</button></span></h5>
+      <div id="fsaBox">${hyg}</div>
+    </div>
+
+    <div class="sect">
+      <h5>Reviews ${cfg.mapsKey ? '<span class="r"><button class="btn sm" id="gBtn">Refresh</button></span>' : ''}</h5>
+      <div id="gWrap">${goo}</div>
+    </div>
+
+    <div class="sect">
+      <h5>Look it up elsewhere</h5>
+      <div class="linkrow">
+        <a href="https://www.tripadvisor.co.uk/Search?q=${q}" target="_blank" rel="noopener">TripAdvisor ↗</a>
+        <a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">Google Maps ↗</a>
+        <a href="https://www.facebook.com/search/top?q=${q}" target="_blank" rel="noopener">Facebook ↗</a>
+        <a href="https://ratings.food.gov.uk/search?searchTerm=${q}" target="_blank" rel="noopener">FSA hygiene ↗</a>
+      </div>
+      <div class="muted" style="margin-top:9px">TripAdvisor doesn’t publish an open feed, so its reviews can’t be shown inside the page — the link opens its search.</div>
+    </div>`;
+
+  const fb = $('#fsaBtn'); if (fb) fb.onclick = () => fsaLookup(s);
+  const gb = $('#gBtn');   if (gb) gb.onclick = () => googleLookup(s);
 }
 
 /* ---------- map ---------- */
@@ -949,7 +1404,7 @@ function renderMap(){
     const rank = ranked.indexOf(s.id) + 1;
     const icon = L.divIcon({html:`<div class="pin ${rank<=3?'top':''}"><span>${rank}</span></div>`, className:'', iconSize:[32,32], iconAnchor:[16,30], popupAnchor:[0,-28]});
     const m = L.marker([s.lat, s.lng], {icon}).addTo(markerLayer);
-    m.bindPopup(`<div class="pop"><b>${esc(s.name)}</b><br><span class="ps">${fmt(overall(s))}/5</span> · #${rank}<br>${esc(s.address||'')}${s.comments?'<br><i>'+esc(s.comments)+'</i>':''}</div>`);
+    m.bindPopup(`<div class="pop"><b>${esc(s.name)}</b><br><span class="ps">${fmt(overall(s))}/5</span> · #${rank}${s.fsa && /^[0-5]$/.test(String(s.fsa.rating)) ? ' · 🧼 '+esc(s.fsa.rating)+'/5' : ''}<br>${esc(s.address||'')}<br><a href="#" data-detail="${esc(s.id)}">Full card →</a></div>`);
     m._shopId = s.id;
     pts.push([s.lat, s.lng]);
   });
@@ -1021,6 +1476,7 @@ function openEdit(id){
 function closeModal(which){
   $('#'+which).hidden = true;
   document.body.style.overflow = '';
+  if (which === 'detailBack') detailId = null;
 }
 function initPickMap(){
   if (!hasL()){
@@ -1124,6 +1580,7 @@ function boot(){
   $('#gOwner').value = cfg.owner; $('#gRepo').value = cfg.repo;
   $('#gBranch').value = cfg.branch || 'main'; $('#gPath').value = cfg.path || 'data.json';
   $('#gToken').value = cfg.token;
+  $('#gMaps').value = cfg.mapsKey || '';
 
   if (ghReady()) pull(false);
 
@@ -1133,6 +1590,13 @@ function boot(){
   $('#sortDir').addEventListener('click', () => { ui.dir = ui.dir==='asc'?'desc':'asc'; saveUI(); renderList(); dirLabel(); });
   $('#mapToggle').addEventListener('click', () => { ui.mapOpen = !ui.mapOpen; applyMapVisibility(); if (ui.mapOpen) renderMap(); });
   $('#addBtn').addEventListener('click', () => openEdit(null));
+  $('#addBtn2').addEventListener('click', () => openEdit(null));
+  $('#dtEdit').addEventListener('click', () => { const id = detailId; closeModal('detailBack'); openEdit(id); });
+  $('#dtMap').addEventListener('click', () => { const id = detailId; closeModal('detailBack'); focusShop(id); });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-detail]');
+    if (b){ e.preventDefault(); openDetail(b.getAttribute('data-detail')); }
+  });
   $$('.hrow button[data-sort]').forEach(b => b.addEventListener('click', () => {
     const key = b.dataset.sort;
     if (ui.sortBy === key) ui.dir = ui.dir==='asc'?'desc':'asc';
@@ -1142,13 +1606,18 @@ function boot(){
   }));
 
   /* row actions */
+  $('#list').addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest('.row');
+    if (row && e.target === row){ e.preventDefault(); openDetail(row.dataset.id); }
+  });
   $('#list').addEventListener('click', e => {
     const btn = e.target.closest('button[data-act]');
     const row = e.target.closest('.row'); if (!row) return;
     const id = row.dataset.id;
-    if (!btn){ ui.expanded[id] = !ui.expanded[id]; saveUI(); renderList(); return; }
+    if (!btn){ openDetail(id); return; }
     const act = btn.dataset.act;
-    if (act === 'toggle'){ ui.expanded[id] = !ui.expanded[id]; saveUI(); renderList(); }
+    if (act === 'detail') openDetail(id);
     else if (act === 'edit') openEdit(id);
     else if (act === 'locate') focusShop(id);
     else if (act === 'up' || act === 'down'){
@@ -1229,6 +1698,7 @@ function boot(){
       data.shops.push(rec);
     }
     markDirty(); renderAll(); closeModal('editBack');
+    if (detailId && !$('#detailBack').hidden) renderDetail(detailId);
     toast(editingId ? 'Updated' : 'Added — ' + fmt(overall(rec)) + '/5');
     editingId = null;
   });
@@ -1242,14 +1712,19 @@ function boot(){
   });
 
   /* settings */
-  $('#settingsBtn').addEventListener('click', () => { $('#setBack').hidden = false; document.body.style.overflow='hidden'; });
+  $('#settingsBtn').addEventListener('click', () => {
+    $('#gOwner').value=cfg.owner; $('#gRepo').value=cfg.repo; $('#gBranch').value=cfg.branch||'main';
+    $('#gPath').value=cfg.path||'data.json'; $('#gToken').value=cfg.token; $('#gMaps').value=cfg.mapsKey||'';
+    $('#setBack').hidden = false; document.body.style.overflow='hidden';
+  });
   $('#saveSettings').addEventListener('click', () => {
     cfg = {
       owner: $('#gOwner').value.trim(),
       repo:  $('#gRepo').value.trim(),
       branch:$('#gBranch').value.trim() || 'main',
       path:  ($('#gPath').value.trim() || 'data.json').replace(/^\/+/,''),
-      token: $('#gToken').value.trim()
+      token: $('#gToken').value.trim(),
+      mapsKey: $('#gMaps').value.trim()
     };
     try { localStorage.setItem(LS_CFG, JSON.stringify(cfg)); } catch(e){}
     remoteSha = null; refreshStatus();
@@ -1259,19 +1734,19 @@ function boot(){
   $('#gPull').addEventListener('click', () => {
     cfg.owner=$('#gOwner').value.trim(); cfg.repo=$('#gRepo').value.trim();
     cfg.branch=$('#gBranch').value.trim()||'main'; cfg.path=($('#gPath').value.trim()||'data.json').replace(/^\/+/,'');
-    cfg.token=$('#gToken').value.trim();
+    cfg.token=$('#gToken').value.trim(); cfg.mapsKey=$('#gMaps').value.trim();
     pull(true);
   });
   $('#gPush').addEventListener('click', async () => {
     cfg.owner=$('#gOwner').value.trim(); cfg.repo=$('#gRepo').value.trim();
     cfg.branch=$('#gBranch').value.trim()||'main'; cfg.path=($('#gPath').value.trim()||'data.json').replace(/^\/+/,'');
-    cfg.token=$('#gToken').value.trim();
+    cfg.token=$('#gToken').value.trim(); cfg.mapsKey=$('#gMaps').value.trim();
     if (remoteSha === null) await pull(false);
     push(false);
   });
 
   /* backups */
-  $('#expJson').addEventListener('click', () => download('data.json', JSON.stringify(data, null, 2)));
+  $('#expJson').addEventListener('click', () => download('data.json', JSON.stringify(forRepo(), null, 2)));
   $('#expCsv').addEventListener('click',  () => download('izzies-coffee-shops.csv', toCsv(), 'text/csv'));
   $('#impBtn').addEventListener('click',  () => $('#impFile').click());
   $('#impFile').addEventListener('change', e => {
