@@ -6,7 +6,7 @@ A single-page coffee shop scoreboard: top three, full sortable list, map, and an
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole app. Nothing to build, nothing to install. |
+| `index.html` | The whole app — including the background and header photos, embedded, so there are no image files to upload and it still looks right offline. |
 | `data.json` | The 13 shops from the original spreadsheet. The page reads and writes this file. |
 
 `index.html` also has a copy of the data baked in, so it still works if you open it before setting up sync.
