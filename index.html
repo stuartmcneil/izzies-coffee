@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3b2416">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Izzies Coffee">
+<title>Izzies Coffee Shops</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --espresso:#2b1a10;
+  --mocha:#4a2c1c;
+  --cocoa:#6b4429;
+  --caramel:#a9714b;
+  --chai:#c98a3c;
+  --gold:#e0ab52;
+  --latte:#d9b791;
+  --foam:#f4e3cc;
+  --cream:#fbf4ea;
+  --paper:#fffaf3;
+  --line:rgba(74,44,28,.16);
+  --line-strong:rgba(74,44,28,.3);
+  --good:#4f7d4a;
+  --bad:#9c4a3c;
+  --shadow:0 2px 4px rgba(43,26,16,.06),0 8px 22px rgba(43,26,16,.09);
+  --radius:16px;
+  --font:"Avenir Next","Segoe UI",Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  color:var(--espresso);
+  background-color:#e9d6bd;
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(255,255,255,.55), transparent 42%),
+    radial-gradient(circle at 88% 4%, rgba(201,138,60,.28), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(107,68,41,.22), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%236b4429' stroke-opacity='.14' stroke-width='1.6'%3E%3Cellipse cx='30' cy='28' rx='9' ry='13' transform='rotate(-28 30 28)'/%3E%3Cpath d='M30 15.5c-4 6-4 19 0 25' /%3E%3Cellipse cx='90' cy='82' rx='9' ry='13' transform='rotate(18 90 82)'/%3E%3Cpath d='M90 69.5c-4 6-4 19 0 25'/%3E%3Cpath d='M74 24h16a3 3 0 0 1 3 3v6a9 9 0 0 1-9 9h-4a9 9 0 0 1-9-9v-6a3 3 0 0 1 3-3z'/%3E%3Cpath d='M93 27h4a4.5 4.5 0 0 1 0 9h-4'/%3E%3Cpath d='M71 46h25'/%3E%3Cpath d='M20 92h16a3 3 0 0 1 3 3v4a8 8 0 0 1-8 8h-6a8 8 0 0 1-8-8v-4a3 3 0 0 1 3-3z'/%3E%3Cpath d='M17 111h25'/%3E%3C/g%3E%3C/svg%3E");
+  background-attachment:fixed;
+}
+.wrap{max-width:1160px;margin:0 auto;padding:0 14px calc(48px + env(safe-area-inset-bottom))}
+
+/* ---------- header ---------- */
+header.hero{
+  margin:0 -14px 18px;
+  padding:26px 20px 22px;
+  background:linear-gradient(160deg,#3b2416 0%,#5a3520 45%,#8b5a33 100%);
+  color:var(--foam);
+  box-shadow:0 10px 30px rgba(43,26,16,.28);
+  position:relative;overflow:hidden;
+  border-bottom:4px solid var(--gold);
+}
+header.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 78% 130%, rgba(224,171,82,.35), transparent 60%);
+}
+.hero-inner{max-width:1132px;margin:0 auto;display:flex;gap:16px;align-items:center;flex-wrap:wrap;position:relative;z-index:1}
+.cup{flex:0 0 auto;width:64px;height:64px}
+.hero h1{margin:0;font-size:clamp(26px,6vw,40px);letter-spacing:.3px;font-weight:800;line-height:1.05}
+.hero p{margin:5px 0 0;opacity:.85;font-size:14px}
+.hero .spacer{flex:1 1 40px}
+.hero-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---------- buttons ---------- */
+button,.btn{font-family:inherit;font-size:14px;cursor:pointer}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;justify-content:center;
+  min-height:42px;padding:0 15px;border-radius:999px;border:1px solid var(--line-strong);
+  background:var(--paper);color:var(--mocha);font-weight:650;
+  box-shadow:0 1px 2px rgba(43,26,16,.12);
+  -webkit-tap-highlight-color:transparent;transition:transform .08s ease,filter .15s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(180deg,var(--gold),#c98a3c);border-color:#a9713a;color:#33200f}
+.btn.ghost{background:rgba(255,250,243,.14);border-color:rgba(244,227,204,.45);color:var(--foam)}
+.btn.danger{background:#fff;border-color:rgba(156,74,60,.5);color:var(--bad)}
+.btn.sm{min-height:34px;padding:0 11px;font-size:13px}
+.icon-btn{
+  width:36px;height:36px;min-height:36px;padding:0;border-radius:11px;border:1px solid var(--line);
+  background:var(--paper);color:var(--cocoa);font-size:15px;line-height:1;display:inline-flex;
+  align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;
+}
+.icon-btn:disabled{opacity:.3}
+
+/* ---------- panels ---------- */
+.panel{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);margin:0 0 18px;overflow:hidden;
+}
+.panel > h2{
+  margin:0;padding:13px 16px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cocoa);background:linear-gradient(180deg,var(--foam),#efdcc2);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:9px;
+}
+.panel > h2 .count{margin-left:auto;font-size:11px;opacity:.7;letter-spacing:.06em}
+.panel-body{padding:14px 16px}
+
+/* ---------- podium ---------- */
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px}
+@media(max-width:720px){.podium{grid-template-columns:1fr}}
+.pod{
+  position:relative;border-radius:14px;padding:15px 15px 13px;color:#2b1a10;
+  background:linear-gradient(165deg,#fff6e9,#f0dcc0);border:1px solid var(--line);
+  box-shadow:0 3px 10px rgba(43,26,16,.1);
+}
+.pod.p1{background:linear-gradient(165deg,#fff3d3,#f0cf8c);border-color:rgba(169,113,58,.5)}
+.pod.p2{background:linear-gradient(165deg,#fbf1e4,#e4d7c6)}
+.pod.p3{background:linear-gradient(165deg,#fbeee2,#e6cdb0)}
+.pod .medal{font-size:22px;line-height:1}
+.pod .pname{font-weight:800;font-size:17px;margin:6px 0 2px;overflow-wrap:anywhere}
+.pod .paddr{font-size:12px;opacity:.68;min-height:16px;overflow-wrap:anywhere}
+.pod .pscore{position:absolute;top:12px;right:13px;font-size:24px;font-weight:800;letter-spacing:-.5px}
+.pod .pscore small{font-size:11px;font-weight:600;opacity:.6}
+.pod .best{margin-top:9px;display:flex;gap:5px;flex-wrap:wrap}
+.chip{
+  font-size:11px;padding:3px 8px;border-radius:999px;background:rgba(107,68,41,.12);
+  border:1px solid rgba(107,68,41,.18);white-space:nowrap;
+}
+
+/* ---------- toolbar ---------- */
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;padding:12px 14px;background:var(--paper);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+.toolbar input[type=search],.toolbar select{
+  font-family:inherit;font-size:15px;min-height:42px;padding:8px 11px;border-radius:11px;
+  border:1px solid var(--line-strong);background:#fff;color:var(--espresso);
+}
+.toolbar input[type=search]{flex:1 1 190px;min-width:0}
+.toolbar select{flex:0 1 auto}
+.grow{flex:1 1 auto}
+
+/* ---------- list ---------- */
+.hrow,.row{
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 74px 150px auto;
+  gap:10px;align-items:center;
+}
+.hrow{padding:9px 14px;background:linear-gradient(180deg,var(--foam),#eeddc4);border-bottom:1px solid var(--line);
+  font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--cocoa)}
+.hrow button{background:none;border:0;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;
+  padding:4px 0;text-align:left;cursor:pointer}
+.hrow button[aria-sort]:not([aria-sort=none])::after{content:" ▾";}
+.hrow button[aria-sort=asc]::after{content:" ▴";}
+.row{padding:11px 14px;border-bottom:1px solid var(--line);background:var(--paper)}
+.row:nth-child(even){background:#fdf7ee}
+.row.dragging{opacity:.4}
+.row.drop-target{box-shadow:inset 0 3px 0 var(--gold)}
+.rank{
+  width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;background:linear-gradient(165deg,#f2e0c6,#e3c9a4);color:var(--mocha);
+  border:1px solid var(--line);
+}
+.rank.top{background:linear-gradient(165deg,var(--gold),#c1832f);color:#32200e;border-color:#a9713a}
+.rname{font-weight:700;font-size:16px;overflow-wrap:anywhere;line-height:1.25}
+.raddr{font-size:12px;opacity:.62;overflow-wrap:anywhere}
+.raddr .nogeo{color:var(--bad);opacity:.9;font-weight:600}
+.score{font-size:20px;font-weight:800;text-align:right;letter-spacing:-.4px}
+.score small{display:block;font-size:10px;font-weight:600;opacity:.55;letter-spacing:.06em}
+.bars{display:flex;gap:2px;align-items:flex-end;height:26px}
+.bars i{flex:1;background:linear-gradient(180deg,var(--caramel),var(--cocoa));border-radius:2px 2px 0 0;min-height:2px;opacity:.85}
+.rowacts{display:flex;gap:5px;justify-content:flex-end}
+.detail{grid-column:1/-1;padding:4px 0 2px}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px 14px;margin-top:6px}
+.crit{display:flex;align-items:center;gap:8px;font-size:13px}
+.crit .cl{flex:1 1 auto;opacity:.75}
+.crit .cv{font-weight:700;width:16px;text-align:right}
+.meter{width:56px;height:7px;border-radius:4px;background:rgba(107,68,41,.16);overflow:hidden;flex:0 0 auto}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--chai),var(--cocoa))}
+.note{margin-top:9px;font-size:13px;background:var(--cream);border-left:3px solid var(--latte);padding:7px 10px;border-radius:0 8px 8px 0;overflow-wrap:anywhere}
+
+@media(max-width:760px){
+  .hrow{display:none}
+  .row{grid-template-columns:40px minmax(0,1fr) auto;padding:12px 12px;border-radius:0}
+  .row .bars{display:none}
+  .score{font-size:18px}
+  .rowacts{grid-column:1/-1;justify-content:flex-start;flex-wrap:wrap}
+}
+
+/* ---------- map ---------- */
+#map{height:min(58vh,440px);width:100%;background:#e7d6bd}
+.leaflet-container{font-family:var(--font)}
+.pin{
+  display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50% 50% 50% 6px;
+  transform:rotate(-45deg);background:linear-gradient(160deg,var(--caramel),var(--mocha));
+  border:2px solid var(--foam);box-shadow:0 3px 8px rgba(0,0,0,.35);color:#fff;font-weight:800;font-size:12px;
+}
+.pin span{transform:rotate(45deg)}
+.pin.top{background:linear-gradient(160deg,var(--gold),#b8781f);color:#32200e}
+.pop b{font-size:14px}
+.pop .ps{font-weight:800}
+
+/* ---------- modal ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(43,26,16,.55);backdrop-filter:blur(2px);z-index:1000;
+  display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow:auto;-webkit-overflow-scrolling:touch}
+.backdrop[hidden]{display:none}
+.modal{
+  background:var(--paper);border-radius:18px;width:100%;max-width:620px;margin:auto;
+  box-shadow:0 24px 60px rgba(0,0,0,.4);border:1px solid var(--line);overflow:hidden;
+}
+.modal h3{margin:0;padding:15px 18px;background:linear-gradient(160deg,#4a2c1c,#8b5a33);color:var(--foam);font-size:17px;
+  display:flex;align-items:center;gap:9px}
+.modal h3 .x{margin-left:auto;background:rgba(255,255,255,.15);border:0;color:var(--foam);width:32px;height:32px;
+  border-radius:9px;font-size:17px;cursor:pointer}
+.modal .body{padding:16px 18px}
+.modal .foot{padding:13px 18px;background:var(--cream);border-top:1px solid var(--line);display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+label.f{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--cocoa);margin:0 0 5px;font-weight:700}
+input[type=text],input[type=password],input[type=number],textarea,select.f{
+  width:100%;font-family:inherit;font-size:16px;padding:10px 12px;border-radius:11px;
+  border:1px solid var(--line-strong);background:#fff;color:var(--espresso);min-height:44px;
+}
+textarea{min-height:74px;resize:vertical}
+.field{margin-bottom:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:12px;opacity:.65;margin-top:5px;line-height:1.45}
+.rate{display:grid;grid-template-columns:minmax(96px,1.1fr) auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.rate:last-child{border-bottom:0}
+.rate .rl{font-size:14px;font-weight:650}
+.pips{display:flex;gap:5px}
+.pips button{
+  width:40px;height:40px;border-radius:11px;border:1px solid var(--line-strong);background:#fff;
+  font-weight:700;color:var(--cocoa);font-size:15px;-webkit-tap-highlight-color:transparent;
+}
+.pips button[aria-pressed=true]{background:linear-gradient(180deg,var(--gold),#c1832f);border-color:#a9713a;color:#32200e}
+.geo-results{margin-top:8px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.geo-results button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid var(--line);
+  background:#fff;font-size:13.5px;line-height:1.35;cursor:pointer}
+.geo-results button:last-child{border-bottom:0}
+#pickmap{height:230px;border-radius:12px;overflow:hidden;margin-top:9px;border:1px solid var(--line)}
+
+/* ---------- status pill ---------- */
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:650;padding:7px 13px;border-radius:999px;
+  background:rgba(255,250,243,.16);border:1px solid rgba(244,227,204,.4);color:var(--foam)}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+.pill.ok .dot{background:#7fc47a}.pill.warn .dot{background:#f0c14b}.pill.err .dot{background:#e08070}
+.pill.busy .dot{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:2000;
+  background:var(--espresso);color:var(--foam);padding:11px 18px;border-radius:999px;font-size:14px;
+  box-shadow:0 8px 26px rgba(0,0,0,.35);max-width:92vw;text-align:center}
+.toast[hidden]{display:none}
+.empty{padding:28px 16px;text-align:center;opacity:.6;font-size:14px}
+footer.foot{text-align:center;font-size:12px;color:var(--mocha);opacity:.7;padding:6px 0 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <svg class="cup" viewBox="0 0 64 64" aria-hidden="true">
+      <g fill="none" stroke="#f4e3cc" stroke-width="2.6" stroke-linecap="round">
+        <path d="M16 8c-2.5 3.5-2.5 6 0 9.5s2.5 6 0 9.5" opacity=".75"/>
+        <path d="M26 8c-2.5 3.5-2.5 6 0 9.5s2.5 6 0 9.5" opacity=".55"/>
+        <path d="M36 8c-2.5 3.5-2.5 6 0 9.5s2.5 6 0 9.5" opacity=".35"/>
+      </g>
+      <path d="M10 32h34v10a13 13 0 0 1-13 13h-8A13 13 0 0 1 10 42z" fill="#e0ab52" stroke="#f4e3cc" stroke-width="2.4"/>
+      <path d="M44 35h5a7 7 0 0 1 0 14h-5" fill="none" stroke="#f4e3cc" stroke-width="2.4"/>
+      <path d="M10 32h34v4H10z" fill="#fbf4ea" opacity=".8"/>
+      <path d="M6 60h46" stroke="#f4e3cc" stroke-width="2.6" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <h1>Izzies Coffee Shops</h1>
+      <p>Mocha, chai and everything in between &mdash; graded, ranked and mapped.</p>
+    </div>
+    <div class="spacer"></div>
+    <div class="hero-actions">
+      <span class="pill" id="syncPill"><span class="dot"></span><span id="syncText">Local only</span></span>
+      <button class="btn primary" id="addBtn">+ Add shop</button>
+      <button class="btn ghost" id="settingsBtn" aria-label="Settings">⚙︎ Sync</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="panel">
+    <h2>🏆 Top three <span class="count" id="avgAll"></span></h2>
+    <div class="podium" id="podium"></div>
+  </section>
+
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Search name, address or notes…" autocomplete="off">
+    <select id="sortBy" aria-label="Sort by"></select>
+    <button class="btn sm" id="sortDir" title="Toggle sort direction">↓ High first</button>
+    <span class="grow"></span>
+    <button class="btn sm" id="mapToggle">🗺 Hide map</button>
+  </div>
+
+  <section class="panel" id="mapPanel">
+    <h2>📍 Where they are <span class="count" id="mapCount"></span></h2>
+    <div id="map"></div>
+    <div class="empty" id="mapMsg" hidden>The map library couldn’t load — you’re probably offline. Everything else still works; the map comes back next time you have a connection.</div>
+  </section>
+
+  <section class="panel">
+    <h2>☕ The full list <span class="count" id="listCount"></span></h2>
+    <div class="hrow">
+      <div>#</div>
+      <div><button data-sort="name" aria-sort="none">Shop</button></div>
+      <div style="text-align:right"><button data-sort="overall" aria-sort="none">Score</button></div>
+      <div>Breakdown</div>
+      <div></div>
+    </div>
+    <div id="list"></div>
+  </section>
+
+  <footer class="foot">Izzies Coffee Shops · scores are the mean of nine categories · map tiles © OpenStreetMap contributors</footer>
+</div>
+
+<!-- ============ edit modal ============ -->
+<div class="backdrop" id="editBack" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <h3 id="editTitle">☕ Add a coffee shop <button class="x" data-close="editBack" aria-label="Close">✕</button></h3>
+    <div class="body">
+      <div class="field">
+        <label class="f" for="fName">Shop name</label>
+        <input type="text" id="fName" placeholder="e.g. Ty Melin Bakery" autocapitalize="words">
+      </div>
+
+      <div class="field">
+        <label class="f" for="fAddr">Address</label>
+        <input type="text" id="fAddr" placeholder="Street, town, postcode">
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn sm" id="geoSearch">🔎 Find on map</button>
+          <button class="btn sm" id="geoHere">📍 Use my location</button>
+          <button class="btn sm" id="geoClear">Clear pin</button>
+        </div>
+        <div class="geo-results" id="geoResults" hidden></div>
+        <div id="pickmap"></div>
+        <div class="hint" id="geoHint">Tap the map to move the pin. Address search uses OpenStreetMap.</div>
+      </div>
+
+      <div class="field">
+        <label class="f">Grades (1 = awful, 5 = brilliant)</label>
+        <div id="rates"></div>
+      </div>
+
+      <div class="field">
+        <label class="f" for="fComments">Notes</label>
+        <textarea id="fComments" placeholder="Price of a flat white, what to order, who to avoid…"></textarea>
+      </div>
+    </div>
+    <div class="foot">
+      <button class="btn primary" id="saveShop">Save shop</button>
+      <button class="btn" data-close="editBack">Cancel</button>
+      <span class="grow"></span>
+      <button class="btn danger" id="deleteShop" hidden>Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ settings modal ============ -->
+<div class="backdrop" id="setBack" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <h3 id="setTitle">⚙︎ GitHub sync <button class="x" data-close="setBack" aria-label="Close">✕</button></h3>
+    <div class="body">
+      <p class="hint" style="margin-top:0">Point this at a repo and every device you open the page on will read and write the same <code>data.json</code>. Set it up once per device.</p>
+      <div class="two">
+        <div class="field"><label class="f" for="gOwner">GitHub username</label><input type="text" id="gOwner" placeholder="your-username" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+        <div class="field"><label class="f" for="gRepo">Repository</label><input type="text" id="gRepo" placeholder="izzies-coffee" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+      </div>
+      <div class="two">
+        <div class="field"><label class="f" for="gBranch">Branch</label><input type="text" id="gBranch" placeholder="main" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+        <div class="field"><label class="f" for="gPath">Data file path</label><input type="text" id="gPath" placeholder="data.json" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+      </div>
+      <div class="field">
+        <label class="f" for="gToken">Personal access token</label>
+        <input type="password" id="gToken" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="hint">Make a <b>fine-grained token</b> at github.com → Settings → Developer settings → Personal access tokens, limited to this one repository with <b>Contents: Read and write</b>. It is stored only in this browser. Use a <b>private</b> repo if you would rather the ratings stayed yours.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="gPull">⬇︎ Load from GitHub</button>
+        <button class="btn" id="gPush">⬆︎ Save to GitHub now</button>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+      <p class="hint" style="margin-top:0">Backups, in case you ever want the data out.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn sm" id="expJson">⬇︎ Export data.json</button>
+        <button class="btn sm" id="expCsv">⬇︎ Export CSV</button>
+        <button class="btn sm" id="impBtn">⬆︎ Import data.json</button>
+        <input type="file" id="impFile" accept="application/json,.json" hidden>
+      </div>
+    </div>
+    <div class="foot">
+      <button class="btn primary" id="saveSettings">Save settings</button>
+      <button class="btn" data-close="setBack">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ============================================================
+   Izzies Coffee Shops — single-file app
+   ============================================================ */
+const CRITERIA = [
+  {key:'atmosphere',   label:'Atmosphere'},
+  {key:'price',        label:'Price'},
+  {key:'taste',        label:'Taste'},
+  {key:'cakes',        label:'Cakes'},
+  {key:'idiots',       label:'Idiots'},
+  {key:'food',         label:'Food'},
+  {key:'parking',      label:'Parking'},
+  {key:'views',        label:'Views'},
+  {key:'friendliness', label:'Friendliness of Staff'}
+];
+const SEED = {
+  "version": 1,
+  "title": "Izzies Coffee Shops",
+  "updated": "2026-09-01T00:00:00Z",
+  "shops": [
+    {
+      "id": "asda-croyton",
+      "name": "Asda Cardiff Coryton (cafe)",
+      "address": "Longwood Drive, Coryton, Cardiff, CF14 7EW",
+      "lat": 51.5243,
+      "lng": -3.2419,
+      "scores": {
+        "atmosphere": 2,
+        "price": 5,
+        "taste": 4,
+        "cakes": 2,
+        "idiots": 4,
+        "food": 3,
+        "parking": 5,
+        "views": 2,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "coffee-club-whitchurch",
+      "name": "Coffee Club Whitchurch",
+      "address": "",
+      "lat": null,
+      "lng": null,
+      "scores": {
+        "atmosphere": 4,
+        "price": 2,
+        "taste": 4,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "coffee-no-1-whitchurch",
+      "name": "Coffee#1 Whitchurch",
+      "address": "22 Merthyr Road, Whitchurch, Cardiff, CF14 1DH",
+      "lat": 51.5124,
+      "lng": -3.2195,
+      "scores": {
+        "atmosphere": 5,
+        "price": 3,
+        "taste": 5,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 2,
+        "parking": 3,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "ground",
+      "name": "Ground Bakery, Whitchurch",
+      "address": "53C Merthyr Road, Whitchurch, Cardiff, CF14 1DD",
+      "lat": 51.5118,
+      "lng": -3.2177,
+      "scores": {
+        "atmosphere": 4,
+        "price": 3,
+        "taste": 4,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 3,
+        "friendliness": 5
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "fino-lounge",
+      "name": "Fino Lounge",
+      "address": "49 Merthyr Road, Whitchurch, Cardiff, CF14 1DB",
+      "lat": 51.5123,
+      "lng": -3.2187,
+      "scores": {
+        "atmosphere": 4,
+        "price": 4,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "against-the-grain",
+      "name": "Against The Grain Coffee House",
+      "address": "44 Merthyr Road, Whitchurch, Cardiff, CF14 1DJ",
+      "lat": 51.5116,
+      "lng": -3.2181,
+      "scores": {
+        "atmosphere": 4,
+        "price": 4,
+        "taste": 5,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "pink-kiwi",
+      "name": "Pink Kiwi",
+      "address": "138 Crwys Road, Cardiff, CF24 4NR",
+      "lat": 51.4967,
+      "lng": -3.1809,
+      "scores": {
+        "atmosphere": 5,
+        "price": 4,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 4,
+        "parking": 3,
+        "views": 3,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "blossom",
+      "name": "Blossom Cafe",
+      "address": "11 Wellfield Road, Roath, Cardiff, CF24 3NZ",
+      "lat": 51.4949,
+      "lng": -3.166,
+      "scores": {
+        "atmosphere": 4,
+        "price": 3,
+        "taste": 5,
+        "cakes": 4,
+        "idiots": 4,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "wellfield-social",
+      "name": "The Wellfield Social",
+      "address": "41 Wellfield Road, Roath, Cardiff, CF24 3PA",
+      "lat": 51.4956,
+      "lng": -3.1654,
+      "scores": {
+        "atmosphere": 4,
+        "price": 4,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 5,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "12.6",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "the-coffi-house",
+      "name": "The Coffi House",
+      "address": "3 Wellfield Road, Roath, Cardiff, CF24 3NZ",
+      "lat": 51.495,
+      "lng": -3.1659,
+      "scores": {
+        "atmosphere": 4,
+        "price": 5,
+        "taste": 3,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "11.3",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "bentleys-cafe",
+      "name": "Bentleys Cafe",
+      "address": "35 Wellfield Road, Roath, Cardiff, CF24 3PA",
+      "lat": 51.4954,
+      "lng": -3.1655,
+      "scores": {
+        "atmosphere": 4,
+        "price": 5,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "ty-melin-bakery",
+      "name": "Ty Melin Bakery, Wellfield Rd",
+      "address": "49 Wellfield Road, Roath, Cardiff, CF24 3PA",
+      "lat": 51.4957,
+      "lng": -3.1654,
+      "scores": {
+        "atmosphere": 4,
+        "price": 5,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "a-head-of-the-game",
+      "name": "A-Head of the Game",
+      "address": "8 Park Road, Whitchurch, Cardiff, CF14 7BQ",
+      "lat": 51.5162,
+      "lng": -3.2246,
+      "scores": {
+        "atmosphere": 2,
+        "price": 2,
+        "taste": 2,
+        "cakes": 4,
+        "idiots": 2,
+        "food": 4,
+        "parking": 2,
+        "views": 3,
+        "friendliness": 1
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    }
+  ]
+};
+const LS_DATA = 'izzies.data.v1';
+const LS_CFG  = 'izzies.github.v1';
+const LS_UI   = 'izzies.ui.v1';
+
+/* ---------- state ---------- */
+let data = {version:1, title:'Izzies Coffee Shops', updated:null, shops:[]};
+let cfg  = {owner:'', repo:'', branch:'main', path:'data.json', token:''};
+let ui   = {sortBy:'overall', dir:'desc', mapOpen:true, expanded:{}};
+let remoteSha = null, dirty = false, saveTimer = null, editingId = null;
+let map, markerLayer, pickMap, pickMarker, pickLL = null;
+
+/* ---------- helpers ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function overall(shop){
+  const v = CRITERIA.map(c => shop.scores?.[c.key]).filter(n => typeof n === 'number' && !isNaN(n));
+  return v.length ? v.reduce((a,b)=>a+b,0)/v.length : 0;
+}
+function fmt(n){ return (Math.round(n*10)/10).toFixed(1); }
+function byScore(a,b){ return (overall(b)-overall(a)) || a.name.localeCompare(b.name,'en',{sensitivity:'base'}); }
+function rankOrder(){ return data.shops.slice().sort(byScore).map(s => s.id); }
+function slug(s){
+  return String(s).toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g,'').trim().replace(/[\s_]+/g,'-').replace(/-+/g,'-') || ('shop-'+Date.now());
+}
+function uniqueId(base){
+  let id = slug(base), n = 2;
+  while (data.shops.some(s => s.id === id && s.id !== editingId)) id = slug(base)+'-'+(n++);
+  return id;
+}
+let toastTimer;
+function toast(msg, ms=2600){
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{t.hidden = true}, ms);
+}
+function saveLocal(){
+  try { localStorage.setItem(LS_DATA, JSON.stringify(data)); } catch(e){}
+}
+function saveUI(){ try { localStorage.setItem(LS_UI, JSON.stringify(ui)); } catch(e){} }
+
+/* ---------- sync status ---------- */
+function setStatus(kind, text){
+  const p = $('#syncPill');
+  p.className = 'pill ' + kind;
+  $('#syncText').textContent = text;
+}
+function ghReady(){ return cfg.owner && cfg.repo && cfg.token; }
+function refreshStatus(){
+  if (!ghReady())      setStatus('warn', 'Local only');
+  else if (dirty)      setStatus('warn', 'Unsaved');
+  else                 setStatus('ok', 'Synced');
+}
+function markDirty(){
+  data.updated = new Date().toISOString();
+  saveLocal();
+  dirty = true; refreshStatus();
+  if (ghReady()){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>push(true), 1600);
+  }
+}
+
+/* ---------- GitHub ---------- */
+function b64encode(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+function b64decode(b64){
+  const bin = atob(String(b64).replace(/\s/g,''));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+function ghUrl(){
+  return `https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${cfg.path.split('/').map(encodeURIComponent).join('/')}`;
+}
+function ghHeaders(){
+  return {'Authorization':'Bearer '+cfg.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28'};
+}
+async function pull(loud){
+  if (!ghReady()){ if (loud) toast('Add your GitHub details first'); return; }
+  setStatus('busy','Loading…');
+  try{
+    const r = await fetch(ghUrl()+'?ref='+encodeURIComponent(cfg.branch||'main')+'&t='+Date.now(), {headers:ghHeaders(), cache:'no-store'});
+    if (r.status === 404){ remoteSha = null; refreshStatus(); if (loud) toast('No data.json in the repo yet — press Save to create it'); return; }
+    if (!r.ok) throw new Error('GitHub said '+r.status+(r.status===401?' (check the token)':''));
+    const j = await r.json();
+    remoteSha = j.sha;
+    const incoming = JSON.parse(b64decode(j.content));
+    if (incoming && Array.isArray(incoming.shops)){
+      data = normalise(incoming);
+      saveLocal(); dirty = false; renderAll(); refreshStatus();
+      if (loud) toast('Loaded '+data.shops.length+' shops from GitHub');
+    }
+  }catch(e){
+    setStatus('err','Sync failed'); toast('Could not load: '+e.message, 4200);
+  }
+}
+async function push(quiet){
+  if (!ghReady()){ if (!quiet) toast('Add your GitHub details first'); return; }
+  setStatus('busy','Saving…');
+  try{
+    const body = {
+      message: 'Update coffee shop data ('+data.shops.length+' shops)',
+      content: b64encode(JSON.stringify(data, null, 2)),
+      branch: cfg.branch || 'main'
+    };
+    if (remoteSha) body.sha = remoteSha;
+    let r = await fetch(ghUrl(), {method:'PUT', headers:{...ghHeaders(),'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if (r.status === 409 || r.status === 422){
+      // someone else (another device) wrote first — refetch the sha and retry once
+      const g = await fetch(ghUrl()+'?ref='+encodeURIComponent(cfg.branch||'main')+'&t='+Date.now(), {headers:ghHeaders(), cache:'no-store'});
+      if (g.ok){ const gj = await g.json(); remoteSha = gj.sha; body.sha = remoteSha;
+        r = await fetch(ghUrl(), {method:'PUT', headers:{...ghHeaders(),'Content-Type':'application/json'}, body: JSON.stringify(body)});
+      }
+    }
+    if (!r.ok){
+      const txt = await r.text().catch(()=> '');
+      throw new Error('GitHub said '+r.status+' '+(txt.slice(0,120)));
+    }
+    const j = await r.json();
+    remoteSha = j.content && j.content.sha;
+    dirty = false; refreshStatus();
+    if (!quiet) toast('Saved to GitHub');
+  }catch(e){
+    setStatus('err','Save failed'); toast('Could not save: '+e.message, 5000);
+  }
+}
+
+/* ---------- data shaping ---------- */
+function normalise(d){
+  const out = {version:1, title:'Izzies Coffee Shops', updated:d.updated||null, shops:[]};
+  out.shops = (d.shops||[]).map(s => ({
+    id: s.id || slug(s.name||'shop'),
+    name: s.name || 'Untitled',
+    address: s.address || '',
+    lat: (typeof s.lat === 'number') ? s.lat : null,
+    lng: (typeof s.lng === 'number') ? s.lng : null,
+    scores: CRITERIA.reduce((o,c) => (o[c.key] = (typeof s.scores?.[c.key] === 'number' ? s.scores[c.key] : null), o), {}),
+    comments: s.comments || '',
+    added: s.added || ''
+  }));
+  return out;
+}
+
+/* ---------- sorting ---------- */
+function sortOptions(){
+  const sel = $('#sortBy');
+  const opts = [['overall','Overall score'],['name','Name (A–Z)'],['manual','My own order'],['added','Date added']]
+    .concat(CRITERIA.map(c => ['c:'+c.key, c.label]));
+  sel.innerHTML = opts.map(([v,l]) => `<option value="${v}">${esc(l)}</option>`).join('');
+}
+function sortedShops(){
+  const q = $('#search').value.trim().toLowerCase();
+  let arr = data.shops.slice();
+  if (q) arr = arr.filter(s => (s.name+' '+s.address+' '+s.comments).toLowerCase().includes(q));
+  const dir = ui.dir === 'asc' ? 1 : -1;
+  const by = ui.sortBy;
+  if (by === 'manual'){
+    if (ui.dir === 'asc') arr.reverse();
+  } else if (by === 'name'){
+    arr.sort((a,b) => a.name.localeCompare(b.name, 'en', {sensitivity:'base'}) * (ui.dir==='asc' ? 1 : -1));
+  } else if (by === 'added'){
+    arr.sort((a,b) => String(a.added).localeCompare(String(b.added)) * dir);
+  } else if (by.startsWith('c:')){
+    const k = by.slice(2);
+    arr.sort((a,b) => ((a.scores[k]??-1) - (b.scores[k]??-1)) * dir || a.name.localeCompare(b.name));
+  } else {
+    arr.sort((a,b) => ui.dir==='desc' ? byScore(a,b) : -byScore(a,b));
+  }
+  return arr;
+}
+function dirLabel(){
+  const b = $('#sortDir');
+  if (ui.sortBy === 'manual') b.textContent = ui.dir==='asc' ? '↑ Reversed' : '↓ My order';
+  else if (ui.sortBy === 'name') b.textContent = ui.dir==='asc' ? '↓ A → Z' : '↑ Z → A';
+  else b.textContent = ui.dir==='asc' ? '↑ Low first' : '↓ High first';
+}
+
+/* ---------- rendering ---------- */
+function renderAll(){ renderPodium(); renderList(); renderMap(); dirLabel(); }
+
+function renderPodium(){
+  const top = data.shops.slice().sort(byScore).slice(0,3);
+  const medals = ['🥇','🥈','🥉'];
+  $('#podium').innerHTML = top.length ? top.map((s,i) => {
+    const best = CRITERIA.filter(c => s.scores[c.key] >= 5).slice(0,4).map(c => `<span class="chip">${esc(c.label)} 5</span>`).join('');
+    return `<div class="pod p${i+1}">
+      <div class="medal">${medals[i]}</div>
+      <div class="pscore">${fmt(overall(s))}<small>/5</small></div>
+      <div class="pname">${esc(s.name)}</div>
+      <div class="paddr">${esc(s.address || 'No address yet')}</div>
+      <div class="best">${best || '<span class="chip">no straight fives</span>'}</div>
+    </div>`;
+  }).join('') : '<div class="empty">Add a shop and the podium fills up.</div>';
+  const all = data.shops.map(overall).filter(n=>n>0);
+  $('#avgAll').textContent = all.length ? ('average ' + fmt(all.reduce((a,b)=>a+b,0)/all.length) + '/5 across ' + all.length) : '';
+}
+
+function renderList(){
+  const arr = sortedShops();
+  const manual = ui.sortBy === 'manual' && ui.dir === 'desc';
+  const ranked = rankOrder();
+  $('#listCount').textContent = arr.length + (arr.length===1?' shop':' shops');
+  if (!arr.length){ $('#list').innerHTML = '<div class="empty">Nothing matches. Try a different search.</div>'; return; }
+
+  $('#list').innerHTML = arr.map((s, i) => {
+    const rank = ranked.indexOf(s.id) + 1;
+    const open = !!ui.expanded[s.id];
+    const bars = CRITERIA.map(c => `<i style="height:${((s.scores[c.key]||0)/5)*100}%" title="${esc(c.label)}: ${s.scores[c.key]??'–'}"></i>`).join('');
+    const detail = open ? `<div class="detail">
+        <div class="detail-grid">${CRITERIA.map(c => `<div class="crit"><span class="cl">${esc(c.label)}</span><span class="meter"><i style="width:${((s.scores[c.key]||0)/5)*100}%"></i></span><span class="cv">${s.scores[c.key]??'–'}</span></div>`).join('')}</div>
+        ${s.comments ? `<div class="note">${esc(s.comments)}</div>` : ''}
+      </div>` : '';
+    return `<div class="row" data-id="${esc(s.id)}" ${manual?'draggable="true"':''}>
+      <div class="rank ${rank<=3?'top':''}">${rank}</div>
+      <div>
+        <div class="rname">${esc(s.name)}</div>
+        <div class="raddr">${s.address ? esc(s.address) : ''}${(s.lat==null?`<span class="nogeo">${s.address?' · ':''}no map pin yet</span>`:'')}</div>
+      </div>
+      <div class="score">${fmt(overall(s))}<small>OVERALL</small></div>
+      <div class="bars">${bars}</div>
+      <div class="rowacts">
+        ${manual ? `<button class="icon-btn" data-act="up" ${i===0?'disabled':''} aria-label="Move up">↑</button>
+                    <button class="icon-btn" data-act="down" ${i===arr.length-1?'disabled':''} aria-label="Move down">↓</button>` : ''}
+        <button class="icon-btn" data-act="toggle" aria-label="Show details">${open?'▴':'▾'}</button>
+        <button class="icon-btn" data-act="edit" aria-label="Edit">✎</button>
+        <button class="icon-btn" data-act="locate" aria-label="Show on map" ${s.lat==null?'disabled':''}>📍</button>
+      </div>
+      ${detail}
+    </div>`;
+  }).join('');
+}
+
+/* ---------- map ---------- */
+function hasL(){ return typeof L !== 'undefined' && L && typeof L.map === 'function'; }
+function ensureMap(){
+  if (map) return true;
+  if (!hasL()){ $('#map').style.display = 'none'; $('#mapMsg').hidden = false; return false; }
+  map = L.map('map', {scrollWheelZoom:false, tap:true}).setView([51.5074,-3.2000], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+  markerLayer = L.layerGroup().addTo(map);
+  map.on('click', ()=> map.scrollWheelZoom.enable());
+  return true;
+}
+function renderMap(){
+  if (!ui.mapOpen) return;
+  if (!ensureMap()){ $('#mapCount').textContent = 'map offline'; return; }
+  markerLayer.clearLayers();
+  const ranked = rankOrder();
+  const pts = [];
+  data.shops.forEach(s => {
+    if (s.lat == null || s.lng == null) return;
+    const rank = ranked.indexOf(s.id) + 1;
+    const icon = L.divIcon({html:`<div class="pin ${rank<=3?'top':''}"><span>${rank}</span></div>`, className:'', iconSize:[32,32], iconAnchor:[16,30], popupAnchor:[0,-28]});
+    const m = L.marker([s.lat, s.lng], {icon}).addTo(markerLayer);
+    m.bindPopup(`<div class="pop"><b>${esc(s.name)}</b><br><span class="ps">${fmt(overall(s))}/5</span> · #${rank}<br>${esc(s.address||'')}${s.comments?'<br><i>'+esc(s.comments)+'</i>':''}</div>`);
+    m._shopId = s.id;
+    pts.push([s.lat, s.lng]);
+  });
+  const missing = data.shops.filter(s => s.lat == null).length;
+  $('#mapCount').textContent = pts.length + ' pinned' + (missing ? ' · ' + missing + ' without a pin' : '');
+  if (pts.length){
+    map.fitBounds(L.latLngBounds(pts).pad(0.25), {maxZoom: 15});
+  }
+  setTimeout(()=> map.invalidateSize(), 60);
+}
+function focusShop(id){
+  const s = data.shops.find(x => x.id === id);
+  if (!s || s.lat == null) return;
+  if (!ui.mapOpen){ ui.mapOpen = true; applyMapVisibility(); renderMap(); }
+  if (!ensureMap()) return;
+  map.setView([s.lat, s.lng], 17, {animate:true});
+  markerLayer.eachLayer(m => { if (m._shopId === id) m.openPopup(); });
+  $('#mapPanel').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function applyMapVisibility(){
+  $('#mapPanel').hidden = !ui.mapOpen;
+  $('#mapToggle').textContent = ui.mapOpen ? '🗺 Hide map' : '🗺 Show map';
+  saveUI();
+}
+
+/* ---------- edit modal ---------- */
+function buildRates(){
+  $('#rates').innerHTML = CRITERIA.map(c => `<div class="rate" data-key="${c.key}">
+      <div class="rl">${esc(c.label)}</div>
+      <div class="pips">${[1,2,3,4,5].map(n => `<button type="button" data-v="${n}" aria-pressed="false">${n}</button>`).join('')}</div>
+    </div>`).join('');
+  $('#rates').addEventListener('click', e => {
+    const b = e.target.closest('button[data-v]'); if (!b) return;
+    const row = b.closest('.rate');
+    const already = b.getAttribute('aria-pressed') === 'true';
+    row.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed','false'));
+    if (!already) b.setAttribute('aria-pressed','true');
+  });
+}
+function readRates(){
+  const o = {};
+  $$('#rates .rate').forEach(row => {
+    const on = row.querySelector('button[aria-pressed=true]');
+    o[row.dataset.key] = on ? Number(on.dataset.v) : null;
+  });
+  return o;
+}
+function writeRates(scores){
+  $$('#rates .rate').forEach(row => {
+    const v = scores?.[row.dataset.key];
+    row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === v)));
+  });
+}
+function openEdit(id){
+  editingId = id || null;
+  const s = id ? data.shops.find(x => x.id === id) : null;
+  $('#editTitle').firstChild.nodeValue = s ? '✎ Edit shop ' : '☕ Add a coffee shop ';
+  $('#fName').value = s ? s.name : '';
+  $('#fAddr').value = s ? s.address : '';
+  $('#fComments').value = s ? s.comments : '';
+  writeRates(s ? s.scores : {});
+  pickLL = (s && s.lat != null) ? {lat:s.lat, lng:s.lng} : null;
+  $('#geoResults').hidden = true; $('#geoResults').innerHTML = '';
+  $('#deleteShop').hidden = !s;
+  $('#editBack').hidden = false;
+  document.body.style.overflow = 'hidden';
+  setTimeout(()=>{ initPickMap(); $('#fName').focus(); }, 40);
+}
+function closeModal(which){
+  $('#'+which).hidden = true;
+  document.body.style.overflow = '';
+}
+function initPickMap(){
+  if (!hasL()){
+    $('#pickmap').style.display = 'none';
+    $('#geoHint').textContent = pickLL
+      ? 'Pin kept at ' + pickLL.lat.toFixed(5) + ', ' + pickLL.lng.toFixed(5) + ' (map is offline, so it can’t be moved right now).'
+      : 'Map is offline — save the shop now and drop its pin next time you have a connection.';
+    return;
+  }
+  if (!pickMap){
+    pickMap = L.map('pickmap', {scrollWheelZoom:false}).setView([51.5074,-3.2], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OSM'}).addTo(pickMap);
+    pickMap.on('click', e => setPick(e.latlng, false));
+  }
+  pickMap.invalidateSize();
+  if (pickLL){ setPick(pickLL, true); }
+  else {
+    if (pickMarker){ pickMap.removeLayer(pickMarker); pickMarker = null; }
+    pickMap.setView([51.5074,-3.2], 12);
+    $('#geoHint').textContent = 'Tap the map to drop a pin, search the address, or use your location.';
+  }
+}
+function setPick(ll, keepZoom){
+  pickLL = {lat:+(+ll.lat).toFixed(6), lng:+(+ll.lng).toFixed(6)};
+  if (!hasL() || !pickMap){
+    $('#geoHint').textContent = 'Pin set at ' + pickLL.lat.toFixed(5) + ', ' + pickLL.lng.toFixed(5) + '.';
+    return;
+  }
+  if (!pickMarker){
+    pickMarker = L.marker([pickLL.lat, pickLL.lng], {draggable:true}).addTo(pickMap);
+    pickMarker.on('dragend', () => setPick(pickMarker.getLatLng(), true));
+  } else pickMarker.setLatLng([pickLL.lat, pickLL.lng]);
+  pickMap.setView([pickLL.lat, pickLL.lng], keepZoom ? Math.max(pickMap.getZoom(),15) : Math.max(pickMap.getZoom(),16));
+  $('#geoHint').textContent = 'Pin set at ' + pickLL.lat.toFixed(5) + ', ' + pickLL.lng.toFixed(5) + ' — drag it to fine-tune.';
+}
+async function geocode(){
+  const q = ($('#fAddr').value.trim() || $('#fName').value.trim());
+  if (!q){ toast('Type a name or address first'); return; }
+  const box = $('#geoResults');
+  box.hidden = false; box.innerHTML = '<button disabled>Searching…</button>';
+  try{
+    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&q=' + encodeURIComponent(q);
+    const r = await fetch(url, {headers:{'Accept':'application/json'}});
+    if (!r.ok) throw new Error('search failed');
+    const j = await r.json();
+    if (!j.length){ box.innerHTML = '<button disabled>Nothing found — try adding the town or postcode, or tap the map.</button>'; return; }
+    box.innerHTML = j.map((p,i) => `<button type="button" data-i="${i}">${esc(p.display_name)}</button>`).join('');
+    box.onclick = e => {
+      const b = e.target.closest('button[data-i]'); if (!b) return;
+      const p = j[+b.dataset.i];
+      if (!$('#fAddr').value.trim()) $('#fAddr').value = p.display_name;
+      setPick({lat:+p.lat, lng:+p.lon}, false);
+      box.hidden = true;
+    };
+  }catch(e){
+    box.innerHTML = '<button disabled>Search unavailable — tap the map to place the pin instead.</button>';
+  }
+}
+
+/* ---------- export / import ---------- */
+function download(name, text, type){
+  const b = new Blob([text], {type: type||'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function toCsv(){
+  const head = ['Coffee Shop','Address','Latitude','Longitude', ...CRITERIA.map(c=>c.label), 'Overall Score','Comments'];
+  const rows = data.shops.slice().sort(byScore).map(s => [
+    s.name, s.address, s.lat??'', s.lng??'', ...CRITERIA.map(c => s.scores[c.key]??''), fmt(overall(s)), s.comments
+  ]);
+  return [head, ...rows].map(r => r.map(v => {
+    const t = String(v==null?'':v);
+    return /[",\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t;
+  }).join(',')).join('\r\n');
+}
+
+/* ---------- wiring ---------- */
+function boot(){
+  // config + ui
+  try { Object.assign(cfg, JSON.parse(localStorage.getItem(LS_CFG) || '{}')); } catch(e){}
+  try { Object.assign(ui,  JSON.parse(localStorage.getItem(LS_UI)  || '{}')); } catch(e){}
+  ui.expanded = ui.expanded || {};
+
+  // data: local cache first, otherwise the built-in seed
+  let local = null;
+  try { local = JSON.parse(localStorage.getItem(LS_DATA) || 'null'); } catch(e){}
+  data = normalise(local && Array.isArray(local.shops) && local.shops.length ? local : SEED);
+  saveLocal();
+
+  sortOptions();
+  buildRates();
+  $('#sortBy').value = ui.sortBy;
+  $('#search').value = '';
+  applyMapVisibility();
+  renderAll();
+  refreshStatus();
+
+  // settings fields
+  $('#gOwner').value = cfg.owner; $('#gRepo').value = cfg.repo;
+  $('#gBranch').value = cfg.branch || 'main'; $('#gPath').value = cfg.path || 'data.json';
+  $('#gToken').value = cfg.token;
+
+  if (ghReady()) pull(false);
+
+  /* toolbar */
+  $('#search').addEventListener('input', renderList);
+  $('#sortBy').addEventListener('change', e => { ui.sortBy = e.target.value; saveUI(); renderList(); dirLabel(); });
+  $('#sortDir').addEventListener('click', () => { ui.dir = ui.dir==='asc'?'desc':'asc'; saveUI(); renderList(); dirLabel(); });
+  $('#mapToggle').addEventListener('click', () => { ui.mapOpen = !ui.mapOpen; applyMapVisibility(); if (ui.mapOpen) renderMap(); });
+  $('#addBtn').addEventListener('click', () => openEdit(null));
+  $$('.hrow button[data-sort]').forEach(b => b.addEventListener('click', () => {
+    const key = b.dataset.sort;
+    if (ui.sortBy === key) ui.dir = ui.dir==='asc'?'desc':'asc';
+    else { ui.sortBy = key; ui.dir = key==='name'?'asc':'desc'; }
+    $('#sortBy').value = ui.sortBy; saveUI(); renderList(); dirLabel();
+    $$('.hrow button[data-sort]').forEach(x => x.setAttribute('aria-sort', x===b ? ui.dir : 'none'));
+  }));
+
+  /* row actions */
+  $('#list').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-act]');
+    const row = e.target.closest('.row'); if (!row) return;
+    const id = row.dataset.id;
+    if (!btn){ ui.expanded[id] = !ui.expanded[id]; saveUI(); renderList(); return; }
+    const act = btn.dataset.act;
+    if (act === 'toggle'){ ui.expanded[id] = !ui.expanded[id]; saveUI(); renderList(); }
+    else if (act === 'edit') openEdit(id);
+    else if (act === 'locate') focusShop(id);
+    else if (act === 'up' || act === 'down'){
+      const i = data.shops.findIndex(s => s.id === id);
+      const j = act === 'up' ? i-1 : i+1;
+      if (i < 0 || j < 0 || j >= data.shops.length) return;
+      const [m] = data.shops.splice(i,1); data.shops.splice(j,0,m);
+      markDirty(); renderList();
+    }
+  });
+
+  /* drag reorder (desktop, manual mode) */
+  let dragId = null;
+  $('#list').addEventListener('dragstart', e => {
+    const row = e.target.closest('.row'); if (!row) return;
+    dragId = row.dataset.id; row.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragId); } catch(err){}
+  });
+  $('#list').addEventListener('dragover', e => {
+    if (!dragId) return; e.preventDefault();
+    const row = e.target.closest('.row');
+    $$('#list .row').forEach(r => r.classList.remove('drop-target'));
+    if (row && row.dataset.id !== dragId) row.classList.add('drop-target');
+  });
+  $('#list').addEventListener('drop', e => {
+    e.preventDefault();
+    const row = e.target.closest('.row');
+    if (dragId && row && row.dataset.id !== dragId){
+      const from = data.shops.findIndex(s => s.id === dragId);
+      const to   = data.shops.findIndex(s => s.id === row.dataset.id);
+      if (from > -1 && to > -1){ const [m] = data.shops.splice(from,1); data.shops.splice(to,0,m); markDirty(); }
+    }
+    dragId = null; renderList();
+  });
+  $('#list').addEventListener('dragend', () => { dragId = null; $$('#list .row').forEach(r => r.classList.remove('dragging','drop-target')); });
+
+  /* modal plumbing */
+  $$('[data-close]').forEach(b => b.addEventListener('click', () => closeModal(b.dataset.close)));
+  $$('.backdrop').forEach(b => b.addEventListener('click', e => { if (e.target === b) closeModal(b.id); }));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape'){ $$('.backdrop').forEach(b => { if (!b.hidden) closeModal(b.id); }); } });
+
+  /* geocoding */
+  $('#geoSearch').addEventListener('click', geocode);
+  $('#geoClear').addEventListener('click', () => {
+    pickLL = null;
+    if (pickMarker){ pickMap.removeLayer(pickMarker); pickMarker = null; }
+    $('#geoHint').textContent = 'No pin — this shop will be listed but not mapped.';
+  });
+  $('#geoHere').addEventListener('click', () => {
+    if (!navigator.geolocation){ toast('This browser has no location support'); return; }
+    $('#geoHint').textContent = 'Finding you…';
+    navigator.geolocation.getCurrentPosition(
+      p => setPick({lat:p.coords.latitude, lng:p.coords.longitude}, false),
+      () => { $('#geoHint').textContent = 'Location refused — tap the map instead.'; },
+      {enableHighAccuracy:true, timeout:10000}
+    );
+  });
+
+  /* save shop */
+  $('#saveShop').addEventListener('click', () => {
+    const name = $('#fName').value.trim();
+    if (!name){ toast('Give it a name first'); $('#fName').focus(); return; }
+    const rec = {
+      name,
+      address: $('#fAddr').value.trim(),
+      lat: pickLL ? pickLL.lat : null,
+      lng: pickLL ? pickLL.lng : null,
+      scores: readRates(),
+      comments: $('#fComments').value.trim()
+    };
+    if (editingId){
+      const s = data.shops.find(x => x.id === editingId);
+      Object.assign(s, rec);
+    } else {
+      rec.id = uniqueId(name);
+      rec.added = new Date().toISOString().slice(0,10);
+      data.shops.push(rec);
+    }
+    markDirty(); renderAll(); closeModal('editBack');
+    toast(editingId ? 'Updated' : 'Added — ' + fmt(overall(rec)) + '/5');
+    editingId = null;
+  });
+  $('#deleteShop').addEventListener('click', () => {
+    if (!editingId) return;
+    const s = data.shops.find(x => x.id === editingId);
+    if (!confirm('Delete “' + (s ? s.name : '') + '” for good?')) return;
+    data.shops = data.shops.filter(x => x.id !== editingId);
+    delete ui.expanded[editingId];
+    markDirty(); renderAll(); closeModal('editBack'); toast('Deleted'); editingId = null;
+  });
+
+  /* settings */
+  $('#settingsBtn').addEventListener('click', () => { $('#setBack').hidden = false; document.body.style.overflow='hidden'; });
+  $('#saveSettings').addEventListener('click', () => {
+    cfg = {
+      owner: $('#gOwner').value.trim(),
+      repo:  $('#gRepo').value.trim(),
+      branch:$('#gBranch').value.trim() || 'main',
+      path:  ($('#gPath').value.trim() || 'data.json').replace(/^\/+/,''),
+      token: $('#gToken').value.trim()
+    };
+    try { localStorage.setItem(LS_CFG, JSON.stringify(cfg)); } catch(e){}
+    remoteSha = null; refreshStatus();
+    closeModal('setBack');
+    if (ghReady()) pull(true); else toast('Saved — add a token to sync');
+  });
+  $('#gPull').addEventListener('click', () => {
+    cfg.owner=$('#gOwner').value.trim(); cfg.repo=$('#gRepo').value.trim();
+    cfg.branch=$('#gBranch').value.trim()||'main'; cfg.path=($('#gPath').value.trim()||'data.json').replace(/^\/+/,'');
+    cfg.token=$('#gToken').value.trim();
+    pull(true);
+  });
+  $('#gPush').addEventListener('click', async () => {
+    cfg.owner=$('#gOwner').value.trim(); cfg.repo=$('#gRepo').value.trim();
+    cfg.branch=$('#gBranch').value.trim()||'main'; cfg.path=($('#gPath').value.trim()||'data.json').replace(/^\/+/,'');
+    cfg.token=$('#gToken').value.trim();
+    if (remoteSha === null) await pull(false);
+    push(false);
+  });
+
+  /* backups */
+  $('#expJson').addEventListener('click', () => download('data.json', JSON.stringify(data, null, 2)));
+  $('#expCsv').addEventListener('click',  () => download('izzies-coffee-shops.csv', toCsv(), 'text/csv'));
+  $('#impBtn').addEventListener('click',  () => $('#impFile').click());
+  $('#impFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const j = JSON.parse(r.result);
+        if (!Array.isArray(j.shops)) throw new Error('no shops array');
+        data = normalise(j); markDirty(); renderAll(); toast('Imported ' + data.shops.length + ' shops');
+      }catch(err){ toast('That file did not look like data.json'); }
+      e.target.value = '';
+    };
+    r.readAsText(f);
+  });
+
+  window.addEventListener('resize', () => { if (map && ui.mapOpen) map.invalidateSize(); });
+  window.addEventListener('beforeunload', e => { if (dirty && ghReady()){ e.preventDefault(); e.returnValue = ''; } });
+  // pull fresh data when coming back to the tab on another device
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && ghReady() && !dirty) pull(false); });
+}
+boot();
+</script>
+</body>
+</html>

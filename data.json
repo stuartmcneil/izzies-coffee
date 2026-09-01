@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "title": "Izzies Coffee Shops",
+  "updated": "2026-09-01T00:00:00Z",
+  "shops": [
+    {
+      "id": "asda-croyton",
+      "name": "Asda Cardiff Coryton (cafe)",
+      "address": "Longwood Drive, Coryton, Cardiff, CF14 7EW",
+      "lat": 51.5243,
+      "lng": -3.2419,
+      "scores": {
+        "atmosphere": 2,
+        "price": 5,
+        "taste": 4,
+        "cakes": 2,
+        "idiots": 4,
+        "food": 3,
+        "parking": 5,
+        "views": 2,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "coffee-club-whitchurch",
+      "name": "Coffee Club Whitchurch",
+      "address": "",
+      "lat": null,
+      "lng": null,
+      "scores": {
+        "atmosphere": 4,
+        "price": 2,
+        "taste": 4,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "coffee-no-1-whitchurch",
+      "name": "Coffee#1 Whitchurch",
+      "address": "22 Merthyr Road, Whitchurch, Cardiff, CF14 1DH",
+      "lat": 51.5124,
+      "lng": -3.2195,
+      "scores": {
+        "atmosphere": 5,
+        "price": 3,
+        "taste": 5,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 2,
+        "parking": 3,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "ground",
+      "name": "Ground Bakery, Whitchurch",
+      "address": "53C Merthyr Road, Whitchurch, Cardiff, CF14 1DD",
+      "lat": 51.5118,
+      "lng": -3.2177,
+      "scores": {
+        "atmosphere": 4,
+        "price": 3,
+        "taste": 4,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 3,
+        "friendliness": 5
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "fino-lounge",
+      "name": "Fino Lounge",
+      "address": "49 Merthyr Road, Whitchurch, Cardiff, CF14 1DB",
+      "lat": 51.5123,
+      "lng": -3.2187,
+      "scores": {
+        "atmosphere": 4,
+        "price": 4,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "against-the-grain",
+      "name": "Against The Grain Coffee House",
+      "address": "44 Merthyr Road, Whitchurch, Cardiff, CF14 1DJ",
+      "lat": 51.5116,
+      "lng": -3.2181,
+      "scores": {
+        "atmosphere": 4,
+        "price": 4,
+        "taste": 5,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "pink-kiwi",
+      "name": "Pink Kiwi",
+      "address": "138 Crwys Road, Cardiff, CF24 4NR",
+      "lat": 51.4967,
+      "lng": -3.1809,
+      "scores": {
+        "atmosphere": 5,
+        "price": 4,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 4,
+        "parking": 3,
+        "views": 3,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "blossom",
+      "name": "Blossom Cafe",
+      "address": "11 Wellfield Road, Roath, Cardiff, CF24 3NZ",
+      "lat": 51.4949,
+      "lng": -3.166,
+      "scores": {
+        "atmosphere": 4,
+        "price": 3,
+        "taste": 5,
+        "cakes": 4,
+        "idiots": 4,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "wellfield-social",
+      "name": "The Wellfield Social",
+      "address": "41 Wellfield Road, Roath, Cardiff, CF24 3PA",
+      "lat": 51.4956,
+      "lng": -3.1654,
+      "scores": {
+        "atmosphere": 4,
+        "price": 4,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 5,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "12.6",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "the-coffi-house",
+      "name": "The Coffi House",
+      "address": "3 Wellfield Road, Roath, Cardiff, CF24 3NZ",
+      "lat": 51.495,
+      "lng": -3.1659,
+      "scores": {
+        "atmosphere": 4,
+        "price": 5,
+        "taste": 3,
+        "cakes": 4,
+        "idiots": 5,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "11.3",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "bentleys-cafe",
+      "name": "Bentleys Cafe",
+      "address": "35 Wellfield Road, Roath, Cardiff, CF24 3PA",
+      "lat": 51.4954,
+      "lng": -3.1655,
+      "scores": {
+        "atmosphere": 4,
+        "price": 5,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 4,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "ty-melin-bakery",
+      "name": "Ty Melin Bakery, Wellfield Rd",
+      "address": "49 Wellfield Road, Roath, Cardiff, CF24 3PA",
+      "lat": 51.4957,
+      "lng": -3.1654,
+      "scores": {
+        "atmosphere": 4,
+        "price": 5,
+        "taste": 5,
+        "cakes": 5,
+        "idiots": 5,
+        "food": 3,
+        "parking": 2,
+        "views": 4,
+        "friendliness": 4
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    },
+    {
+      "id": "a-head-of-the-game",
+      "name": "A-Head of the Game",
+      "address": "8 Park Road, Whitchurch, Cardiff, CF14 7BQ",
+      "lat": 51.5162,
+      "lng": -3.2246,
+      "scores": {
+        "atmosphere": 2,
+        "price": 2,
+        "taste": 2,
+        "cakes": 4,
+        "idiots": 2,
+        "food": 4,
+        "parking": 2,
+        "views": 3,
+        "friendliness": 1
+      },
+      "comments": "",
+      "visited": "",
+      "added": "2026-09-01"
+    }
+  ]
+}
