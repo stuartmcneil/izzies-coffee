@@ -70,12 +70,12 @@ One caveat: I could not reach the FSA API from the machine I built this on, so t
 - **Sort** by overall score, name, date added, or any single category — and pick **My own order** to drag rows (desktop) or nudge them with ↑ ↓ (touch). That hand-made order is saved with the data.
 - **Search** filters on name, address and notes.
 - **Tap a shop** (anywhere on the row, or the ⓘ button, or *Full card* in a map pin's popup) to open its card: your nine grades with bars, your notes, its food hygiene rating, Google reviews, and search links for TripAdvisor, Google Maps and Facebook.
-- **+ Add a coffee shop** sits above the map as well as in the header: name, address, the nine grades, notes. The overall score is the average of whichever grades you fill in — you can leave some blank.
+- **+ Add a coffee shop** sits at the bottom of the page as well as in the header: name, address, the nine grades, notes. The overall score is the average of whichever grades you fill in — you can leave some blank.
 - **Pins**: type an address and hit *Find on map*, use *Use my location* while you're sat in the place, or just tap the map. Drag the pin to fine-tune. Twelve of the thirteen originals are pre-pinned; *Coffee Club Whitchurch* couldn't be identified, so it needs a pin the next time you're there.
 - **Backups**: ⚙︎ Sync → Export data.json / Export CSV, and Import to restore.
 
 ## Notes
 
-- Scores are the mean of the nine categories: Atmosphere, Price, Taste, Cakes, Idiots, Food, Parking, Views, Friendliness of Staff.
+- Scores are the mean of the nine categories: Atmosphere, Price, Taste, Cakes, Idiotless, Food, Parking, Views, Friendliness of Staff.
 - Map tiles and address search come from OpenStreetMap. Leaflet loads from a CDN, so the map needs a connection — offline, the list and the add form still work.
 - Everything is stored in this repo and in your browser. There is no server and no account.
