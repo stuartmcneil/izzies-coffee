@@ -561,6 +561,12 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
         <div class="hint">Lets each shop card show its live Google rating and a few recent reviews. Create one in the Google Cloud console with the <b>Places API (New)</b> enabled, then restrict it to your Pages URL under <i>Website restrictions</i>. Stored only in this browser — never written to the repo. Leave blank and the cards just show search links instead.</div>
       </div>
 
+      <div class="field">
+        <label class="f" for="gCarto">CARTO basemap key <span style="text-transform:none;letter-spacing:0;font-weight:500;opacity:.7">— optional</span></label>
+        <input type="password" id="gCarto" placeholder="eyJ…" autocapitalize="off" autocorrect="off" spellcheck="false">
+        <div class="hint">Only needed for the two CARTO map styles, which print <b>API KEY REQUIRED</b> across the tiles without one. Free key from <b>carto.com</b> → sign up → Developers → API Keys. The Esri styles need no key at all, so you can ignore this entirely.</div>
+      </div>
+
       <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
       <p class="hint" style="margin-top:0">Backups, in case you ever want the data out.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1040,7 +1046,7 @@ const LS_UI   = 'izzies.ui.v1';
 
 /* ---------- state ---------- */
 let data = {version:1, title:'Izzies Coffee Shops', updated:null, shops:[]};
-let cfg  = {owner:'', repo:'', branch:'main', path:'data.json', token:'', mapsKey:''};
+let cfg  = {owner:'', repo:'', branch:'main', path:'data.json', token:'', mapsKey:'', cartoKey:''};
 let ui   = {sortBy:'overall', dir:'desc', mapOpen:true, expanded:{}};
 let remoteSha = null, dirty = false, saveTimer = null, editingId = null;
 let map, markerLayer, pickMap, pickMarker, pickLL = null;
@@ -1653,18 +1659,23 @@ function hasL(){ return typeof L !== 'undefined' && L && typeof L.map === 'funct
    (opening the file straight off disk is one), so these are the providers that
    actually allow this kind of use. If one stops answering we move down the list. */
 const TILE_SOURCES = [
-  {id:'voyager',  name:'Streets (warm)', url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', subdomains:'abcd', maxZoom:20, attr:'&copy; OpenStreetMap &copy; CARTO'},
-  {id:'positron', name:'Pale',           url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',          subdomains:'abcd', maxZoom:20, attr:'&copy; OpenStreetMap &copy; CARTO'},
-  {id:'esri',     name:'Esri streets',   url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', subdomains:'', maxZoom:19, attr:'Tiles &copy; Esri'},
+  {id:'esri',     name:'Streets',        url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', subdomains:'', maxZoom:19, attr:'Tiles &copy; Esri'},
+  {id:'esritopo', name:'Topographic',    url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',   subdomains:'', maxZoom:19, attr:'Tiles &copy; Esri'},
   {id:'esrisat',  name:'Satellite',      url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',    subdomains:'', maxZoom:19, attr:'Tiles &copy; Esri'},
-  {id:'osm',      name:'OpenStreetMap',  url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',                    subdomains:'abc',  maxZoom:19, attr:'&copy; OpenStreetMap'}
+  {id:'voyager',  name:'Warm streets (CARTO key)', url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', subdomains:'abcd', maxZoom:20, attr:'&copy; OpenStreetMap &copy; CARTO', needsKey:'carto'},
+  {id:'positron', name:'Pale (CARTO key)',         url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',          subdomains:'abcd', maxZoom:20, attr:'&copy; OpenStreetMap &copy; CARTO', needsKey:'carto'},
+  {id:'osm',      name:'OpenStreetMap (websites only)', url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',              subdomains:'abc',  maxZoom:19, attr:'&copy; OpenStreetMap'}
 ];
 function tileSource(){
   return TILE_SOURCES.find(t => t.id === ui.tiles) || TILE_SOURCES[0];
 }
+function tileUrl(src){
+  if (src.needsKey === 'carto' && cfg.cartoKey) return src.url + '?api_key=' + encodeURIComponent(cfg.cartoKey);
+  return src.url;
+}
 function addTiles(targetMap, isMain){
   const src = tileSource();
-  const layer = L.tileLayer(src.url, {maxZoom: src.maxZoom, subdomains: src.subdomains, attribution: src.attr});
+  const layer = L.tileLayer(tileUrl(src), {maxZoom: src.maxZoom, subdomains: src.subdomains, attribution: src.attr});
   let ok = 0, bad = 0, switched = false;
   layer.on('tileload', () => { ok++; });
   layer.on('tileerror', () => {
@@ -1930,6 +1941,7 @@ function boot(){
   $('#gBranch').value = cfg.branch || 'main'; $('#gPath').value = cfg.path || 'data.json';
   $('#gToken').value = cfg.token;
   $('#gMaps').value = cfg.mapsKey || '';
+  $('#gCarto').value = cfg.cartoKey || '';
 
   if (ghReady()) pull(false);
 
@@ -1937,6 +1949,11 @@ function boot(){
   $('#search').addEventListener('input', renderList);
   $('#sortBy').addEventListener('change', e => { ui.sortBy = e.target.value; saveUI(); renderList(); dirLabel(); });
   $('#sortDir').addEventListener('click', () => { ui.dir = ui.dir==='asc'?'desc':'asc'; saveUI(); renderList(); dirLabel(); });
+  if (!ui.tilesV2){
+    ui.tilesV2 = true;
+    if (!cfg.cartoKey && tileSource().needsKey) ui.tiles = TILE_SOURCES[0].id;
+    saveUI();
+  }
   $('#tileStyle').innerHTML = TILE_SOURCES.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
   $('#tileStyle').value = tileSource().id;
   $('#tileStyle').addEventListener('change', e => { ui.tiles = e.target.value; saveUI(); retileAll(); });
@@ -2100,6 +2117,7 @@ function boot(){
   $('#settingsBtn').addEventListener('click', () => {
     $('#gOwner').value=cfg.owner; $('#gRepo').value=cfg.repo; $('#gBranch').value=cfg.branch||'main';
     $('#gPath').value=cfg.path||'data.json'; $('#gToken').value=cfg.token; $('#gMaps').value=cfg.mapsKey||'';
+    $('#gCarto').value=cfg.cartoKey||'';
     $('#setBack').hidden = false; document.body.style.overflow='hidden';
   });
   $('#saveSettings').addEventListener('click', () => {
@@ -2109,10 +2127,11 @@ function boot(){
       branch:$('#gBranch').value.trim() || 'main',
       path:  ($('#gPath').value.trim() || 'data.json').replace(/^\/+/,''),
       token: $('#gToken').value.trim(),
-      mapsKey: $('#gMaps').value.trim()
+      mapsKey: $('#gMaps').value.trim(),
+      cartoKey: $('#gCarto').value.trim()
     };
     try { localStorage.setItem(LS_CFG, JSON.stringify(cfg)); } catch(e){}
-    remoteSha = null; refreshStatus();
+    remoteSha = null; refreshStatus(); retileAll();
     closeModal('setBack');
     if (ghReady()) pull(true); else toast('Saved — add a token to sync');
   });
