@@ -92,5 +92,6 @@ The radius selector runs 3–15 km; 10 km is the default and reaches most of Car
 ## Notes
 
 - Scores are the mean of the nine categories: Atmosphere, Price, Taste, Cakes, Idiotless, Food, Parking, Views, Friendliness of Staff.
-- Map tiles and address search come from OpenStreetMap. Leaflet loads from a CDN, so the map needs a connection — offline, the list and the add form still work.
+- Address search comes from OpenStreetMap. Leaflet loads from a CDN, so the map needs a connection — offline, the list and the add form still work.
+- **Map tiles**: OpenStreetMap's own tile servers refuse requests that don't come from a proper website — opening `index.html` straight off your disk is one of those, and you get grey "Access blocked / 403" squares. So the map defaults to CARTO's tiles, which permit this. The selector in the *Where they are* header offers Streets, Pale, Esri streets, Satellite and plain OpenStreetMap, and your pick is remembered per device. If a provider ever stops answering, the map moves itself down the list and says so.
 - Everything is stored in this repo and in your browser. There is no server and no account.

@@ -317,6 +317,17 @@ textarea{min-height:74px;resize:vertical}
   font-weight:650;text-decoration:none;
 }
 .muted{font-size:13px;opacity:.7;line-height:1.5}
+.tilesel{
+  font-family:inherit;font-size:11px;text-transform:none;letter-spacing:0;font-weight:600;
+  padding:4px 7px;border-radius:8px;border:1px solid var(--line-strong);
+  background:#fff;color:var(--mocha);margin-left:10px;max-width:150px;
+}
+.tilewarn{
+  position:absolute;left:50%;transform:translateX(-50%);top:12px;z-index:500;
+  background:rgba(43,26,16,.94);color:var(--foam);padding:9px 15px;border-radius:999px;
+  font-size:12.5px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.4);max-width:88%;text-align:center;
+}
+.tilewarn[hidden]{display:none}
 
 /* ---------- still to try ---------- */
 .pin.todo{
@@ -413,8 +424,10 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
   </div>
 
   <section class="panel" id="mapPanel">
-    <h2>📍 Where they are <span class="count" id="mapCount"></span></h2>
-    <div id="map"></div>
+    <h2>📍 Where they are <span class="count" id="mapCount"></span>
+      <select id="tileStyle" class="tilesel" aria-label="Map style"></select>
+    </h2>
+    <div style="position:relative"><div id="map"></div><div class="tilewarn" id="tileWarn" hidden></div></div>
     <div class="empty" id="mapMsg" hidden>The map library couldn’t load — you’re probably offline. Everything else still works; the map comes back next time you have a connection.</div>
   </section>
 
@@ -459,7 +472,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
     <a class="dad" href="https://stuartmcneil.github.io/window/" target="_blank" rel="noopener"><span class="cupicon">☕</span>DAD</a>
   </div>
 
-  <footer class="foot">Izzies Coffee Shops · scores are the mean of nine categories · map tiles © OpenStreetMap contributors</footer>
+  <footer class="foot">Izzies Coffee Shops · scores are the mean of nine categories · map data © OpenStreetMap contributors</footer>
 </div>
 
 <!-- ============ edit modal ============ -->
@@ -1635,13 +1648,64 @@ function renderDetail(id){
 
 /* ---------- map ---------- */
 function hasL(){ return typeof L !== 'undefined' && L && typeof L.map === 'function'; }
+
+/* OpenStreetMap's own tile servers refuse requests that have no proper web origin
+   (opening the file straight off disk is one), so these are the providers that
+   actually allow this kind of use. If one stops answering we move down the list. */
+const TILE_SOURCES = [
+  {id:'voyager',  name:'Streets (warm)', url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', subdomains:'abcd', maxZoom:20, attr:'&copy; OpenStreetMap &copy; CARTO'},
+  {id:'positron', name:'Pale',           url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',          subdomains:'abcd', maxZoom:20, attr:'&copy; OpenStreetMap &copy; CARTO'},
+  {id:'esri',     name:'Esri streets',   url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', subdomains:'', maxZoom:19, attr:'Tiles &copy; Esri'},
+  {id:'esrisat',  name:'Satellite',      url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',    subdomains:'', maxZoom:19, attr:'Tiles &copy; Esri'},
+  {id:'osm',      name:'OpenStreetMap',  url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',                    subdomains:'abc',  maxZoom:19, attr:'&copy; OpenStreetMap'}
+];
+function tileSource(){
+  return TILE_SOURCES.find(t => t.id === ui.tiles) || TILE_SOURCES[0];
+}
+function addTiles(targetMap, isMain){
+  const src = tileSource();
+  const layer = L.tileLayer(src.url, {maxZoom: src.maxZoom, subdomains: src.subdomains, attribution: src.attr});
+  let ok = 0, bad = 0, switched = false;
+  layer.on('tileload', () => { ok++; });
+  layer.on('tileerror', () => {
+    bad++;
+    if (switched || ok > 0 || bad < 5) return;
+    switched = true;
+    const i = TILE_SOURCES.indexOf(src);
+    const next = TILE_SOURCES[i + 1];
+    if (next){
+      ui.tiles = next.id; saveUI();
+      if (isMain) showTileWarn('Those map tiles were refused — switching to ' + next.name + '…');
+      retileAll();
+    } else if (isMain){
+      showTileWarn('No map tiles would load. Check the connection, or pick another style.');
+    }
+  });
+  layer.addTo(targetMap);
+  targetMap._tiles_ = layer;
+  return layer;
+}
+function showTileWarn(msg){
+  const w = $('#tileWarn');
+  if (!w) return;
+  w.textContent = msg; w.hidden = false;
+  clearTimeout(showTileWarn._t);
+  showTileWarn._t = setTimeout(() => { w.hidden = true; }, 6000);
+}
+function retileAll(){
+  [[map, true], [pickMap, false]].forEach(([m, isMain]) => {
+    if (!m) return;
+    if (m._tiles_) m.removeLayer(m._tiles_);
+    addTiles(m, isMain);
+  });
+  const sel = $('#tileStyle');
+  if (sel) sel.value = tileSource().id;
+}
 function ensureMap(){
   if (map) return true;
   if (!hasL()){ $('#map').style.display = 'none'; $('#mapMsg').hidden = false; return false; }
   map = L.map('map', {scrollWheelZoom:false, tap:true}).setView([51.5074,-3.2000], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+  addTiles(map, true);
   markerLayer = L.layerGroup().addTo(map);
   map.on('click', ()=> map.scrollWheelZoom.enable());
   return true;
@@ -1767,7 +1831,7 @@ function initPickMap(){
   }
   if (!pickMap){
     pickMap = L.map('pickmap', {scrollWheelZoom:false}).setView([51.5074,-3.2], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'&copy; OSM'}).addTo(pickMap);
+    addTiles(pickMap, false);
     pickMap.on('click', e => setPick(e.latlng, false));
   }
   pickMap.invalidateSize();
@@ -1873,6 +1937,9 @@ function boot(){
   $('#search').addEventListener('input', renderList);
   $('#sortBy').addEventListener('change', e => { ui.sortBy = e.target.value; saveUI(); renderList(); dirLabel(); });
   $('#sortDir').addEventListener('click', () => { ui.dir = ui.dir==='asc'?'desc':'asc'; saveUI(); renderList(); dirLabel(); });
+  $('#tileStyle').innerHTML = TILE_SOURCES.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
+  $('#tileStyle').value = tileSource().id;
+  $('#tileStyle').addEventListener('change', e => { ui.tiles = e.target.value; saveUI(); retileAll(); });
   $('#mapToggle').addEventListener('click', () => { ui.mapOpen = !ui.mapOpen; applyMapVisibility(); if (ui.mapOpen) renderMap(); });
   $('#addBtn').addEventListener('click', () => openEdit(null));
 
