@@ -7,7 +7,7 @@ A single-page coffee shop scoreboard: top three, full sortable list, map, and an
 | File | What it is |
 |---|---|
 | `index.html` | The whole app — including the background and header photos, embedded, so there are no image files to upload and it still looks right offline. |
-| `data.json` | The 13 shops from the original spreadsheet. The page reads and writes this file. |
+| `data.json` | Your shops, plus the list of cafés you've set aside in *Still to try*. The page reads and writes this file. |
 
 `index.html` also has a copy of the data baked in, so it still works if you open it before setting up sync.
 
@@ -63,6 +63,21 @@ Every card has a **Check** button that queries the Food Standards Agency's free 
 - **No record**: Ground Bakery Whitchurch, Coffee Club Whitchurch
 
 One caveat: I could not reach the FSA API from the machine I built this on, so the live **Check** button is written but untested. If it doesn't work from your browser it says so and gives you a link to ratings.food.gov.uk instead — the pre-filled ratings above are unaffected.
+
+## Still to try
+
+The **Still to try** panel finds cafés you haven't rated yet and ranks them by how close they are to **Castell Coch** (51.5366, −3.2547). They show on the map as small grey pins, numbered in the same order, with the castle marked as a red roundel.
+
+Tap **Find cafés near Castell Coch** and it asks two sources at once:
+
+- **OpenStreetMap** (via the Overpass API) — free, no key, no quota. Covers the whole radius. Volunteer-maintained, so a brand-new place may be missing and some entries have no address.
+- **Google Places** — only if you've set a key. Returns the 20 closest, with proper business names and star ratings. It costs a Places search against your quota each time you refresh.
+
+Results are merged: where both know the same place, Google's name, address and rating win and the row is tagged *OSM + Google*. Anything already in your list is filtered out automatically — by position (within 120 m) or by matching name nearby — so rating a place makes it disappear from *Still to try* on its own.
+
+Per row: **Rate it** opens the add form with the name, address and map pin already filled in; **📍** jumps to it on the map; **✕** sets it aside for good. Set-aside cafés sync across your devices in `data.json`, and **⚙︎ Sync → Bring back set-aside cafés** undoes the lot.
+
+The radius selector runs 3–15 km; 10 km is the default and reaches most of Cardiff. The map shows the nearest 60, the list shows 12 at a time. Results are cached in the browser, so the panel is still populated next time you open the page without spending another lookup.
 
 ## Using it
 

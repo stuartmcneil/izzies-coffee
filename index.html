@@ -318,6 +318,39 @@ textarea{min-height:74px;resize:vertical}
 }
 .muted{font-size:13px;opacity:.7;line-height:1.5}
 
+/* ---------- still to try ---------- */
+.pin.todo{
+  width:26px;height:26px;background:linear-gradient(160deg,#9b9086,#5f574f);
+  border:2px solid rgba(244,227,204,.75);box-shadow:0 2px 6px rgba(0,0,0,.3);
+  font-size:10px;opacity:.88;
+}
+.pin.castle{
+  width:38px;height:38px;border-radius:50%;transform:none;
+  background:linear-gradient(160deg,#8a4a3a,#5a2a1e);border:2px solid var(--gold);font-size:18px;
+}
+.pin.castle span{transform:none}
+.todohead{display:flex;gap:9px;flex-wrap:wrap;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--cream)}
+.todohead select{font-family:inherit;font-size:14px;min-height:38px;padding:6px 10px;border-radius:10px;border:1px solid var(--line-strong);background:#fff;color:var(--espresso)}
+.todorow{
+  display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;
+  padding:10px 14px;border-bottom:1px solid var(--line);background:var(--paper);
+}
+.todorow:nth-child(even){background:#fdf7ee}
+.todorow .tr{
+  width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;background:linear-gradient(165deg,#e6e0d6,#cfc6b9);color:#4a4239;
+  border:1px solid rgba(74,44,28,.18);
+}
+.todorow .tn{font-weight:700;font-size:15px;overflow-wrap:anywhere;line-height:1.25}
+.todorow .td{font-size:12px;opacity:.65;overflow-wrap:anywhere;margin-top:1px}
+.todorow .ta{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.dist{font-weight:700;font-size:12px;color:var(--cocoa);white-space:nowrap}
+.srcdot{font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(107,68,41,.08);white-space:nowrap}
+@media(max-width:760px){
+  .todorow{grid-template-columns:36px minmax(0,1fr)}
+  .todorow .ta{grid-column:1/-1;justify-content:flex-start}
+}
+
 /* ---------- dad link ---------- */
 .dadwrap{display:flex;justify-content:center;margin:22px 0 4px}
 a.dad{
@@ -395,6 +428,23 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
       <div></div>
     </div>
     <div id="list"></div>
+  </section>
+
+  <section class="panel" id="todoPanel">
+    <h2>🗺 Still to try <span class="count" id="todoCount"></span></h2>
+    <div class="todohead">
+      <button class="btn sm primary" id="todoFind">Find cafés near Castell Coch</button>
+      <select id="todoRadius" aria-label="Search radius">
+        <option value="3000">within 3 km</option>
+        <option value="5000">within 5 km</option>
+        <option value="10000" selected>within 10 km</option>
+        <option value="15000">within 15 km</option>
+      </select>
+      <button class="btn sm" id="todoMapToggle">Hide grey pins</button>
+      <span class="grow"></span>
+      <span class="muted" id="todoWhen"></span>
+    </div>
+    <div id="todoList"></div>
   </section>
 
   <div class="addbar">
@@ -504,6 +554,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
         <button class="btn sm" id="expJson">⬇︎ Export data.json</button>
         <button class="btn sm" id="expCsv">⬇︎ Export CSV</button>
         <button class="btn sm" id="impBtn">⬆︎ Import data.json</button>
+        <button class="btn sm" id="unskipBtn">↺ Bring back set-aside cafés</button>
         <input type="file" id="impFile" accept="application/json,.json" hidden>
       </div>
     </div>
@@ -1100,6 +1151,174 @@ async function push(quiet){
   }
 }
 
+/* ---------- still to try: cafes near Castell Coch ---------- */
+const CASTLE = {lat:51.5366, lng:-3.2547, name:'Castell Coch'};
+const LS_TODO = 'izzies.todo.v1';
+let todo = {fetched:null, radius:10000, items:[]};
+let todoShow = 12;
+
+function haversine(a, b){
+  const R = 6371000, rad = Math.PI/180;
+  const dLat = (b.lat-a.lat)*rad, dLng = (b.lng-a.lng)*rad;
+  const la1 = a.lat*rad, la2 = b.lat*rad;
+  const h = Math.sin(dLat/2)**2 + Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.min(1, Math.sqrt(h)));
+}
+function km(m){ return m < 950 ? Math.round(m/10)*10 + ' m' : (m/1000).toFixed(m<9500?1:0) + ' km'; }
+function normName(s){
+  const base = String(s||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9 ]/g,' ');
+  const stripped = base.replace(/\b(the|a|cafe|caff|coffee|house|co|ltd|limited|company|bakery|bar|lounge|kitchen|shop|and)\b/g,'').replace(/\s+/g,'');
+  return stripped || base.replace(/\s+/g,'');
+}
+function candKey(c){ return normName(c.name) + '@' + c.lat.toFixed(3) + ',' + c.lng.toFixed(3); }
+function isVisited(c){
+  return data.shops.some(s => {
+    if (s.lat != null && haversine(s, c) < 120) return true;
+    return normName(s.name) === normName(c.name) && s.lat != null && haversine(s, c) < 600;
+  });
+}
+function isSkipped(c){ return (data.skip || []).includes(candKey(c)); }
+
+async function fetchOsm(radius){
+  const around = `(around:${radius},${CASTLE.lat},${CASTLE.lng})`;
+  const q = `[out:json][timeout:25];(nwr["amenity"="cafe"]${around};nwr["shop"="coffee"]${around};);out center tags 500;`;
+  const r = await fetch('https://overpass-api.de/api/interpreter', {
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:'data=' + encodeURIComponent(q)
+  });
+  if (!r.ok) throw new Error('OpenStreetMap returned ' + r.status);
+  const j = await r.json();
+  return (j.elements || []).map(e => {
+    const lat = (e.lat != null) ? e.lat : (e.center && e.center.lat);
+    const lng = (e.lon != null) ? e.lon : (e.center && e.center.lon);
+    const t = e.tags || {};
+    if (!t.name || lat == null || lng == null) return null;
+    const addr = [t['addr:housenumber'], t['addr:street'], t['addr:suburb'] || t['addr:city'], t['addr:postcode']].filter(Boolean).join(' ');
+    return {src:'osm', id:'osm-'+e.type+'-'+e.id, name:t.name, address:addr, lat, lng};
+  }).filter(Boolean);
+}
+
+async function fetchGoogleNearby(radius){
+  if (!cfg.mapsKey) return [];
+  const body = {
+    includedTypes: ['cafe', 'coffee_shop'],
+    maxResultCount: 20,
+    rankPreference: 'DISTANCE',
+    locationRestriction: {circle:{center:{latitude:CASTLE.lat, longitude:CASTLE.lng}, radius: Math.min(radius, 50000)}}
+  };
+  const r = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'X-Goog-Api-Key': cfg.mapsKey,
+      'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.googleMapsUri'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error('Google returned ' + r.status);
+  const j = await r.json();
+  return (j.places || []).map(pl => ({
+    src:'google', id:'g-'+pl.id, placeId: pl.id,
+    name: pl.displayName ? pl.displayName.text : 'Unnamed',
+    address: pl.formattedAddress || '',
+    lat: pl.location.latitude, lng: pl.location.longitude,
+    rating: typeof pl.rating === 'number' ? pl.rating : null,
+    count: pl.userRatingCount || 0,
+    uri: pl.googleMapsUri || null
+  }));
+}
+
+function mergeCandidates(google, osm){
+  const out = [];
+  const add = (c) => {
+    const hit = out.find(o => haversine(o, c) < 80 || (normName(o.name) === normName(c.name) && haversine(o, c) < 400));
+    if (hit){
+      if (c.src === 'google'){
+        hit.name = c.name; hit.address = c.address || hit.address;
+        hit.rating = c.rating; hit.count = c.count; hit.uri = c.uri; hit.placeId = c.placeId;
+      }
+      hit.src = 'both';
+      return;
+    }
+    out.push(Object.assign({}, c));
+  };
+  google.forEach(add);
+  osm.forEach(add);
+  return out;
+}
+
+async function findNearby(radius){
+  const btn = $('#todoFind');
+  btn.disabled = true; btn.textContent = 'Looking…';
+  $('#todoWhen').textContent = cfg.mapsKey ? 'Asking OpenStreetMap and Google…' : 'Asking OpenStreetMap…';
+  let osm = [], goo = [], notes = [];
+  const [ro, rg] = await Promise.allSettled([fetchOsm(radius), fetchGoogleNearby(radius)]);
+  if (ro.status === 'fulfilled') osm = ro.value; else notes.push('OpenStreetMap lookup failed (' + ro.reason.message + ')');
+  if (rg.status === 'fulfilled') goo = rg.value; else notes.push('Google lookup failed (' + rg.reason.message + ')');
+  todo = {
+    fetched: new Date().toISOString(),
+    radius,
+    items: mergeCandidates(goo, osm),
+    notes
+  };
+  try { localStorage.setItem(LS_TODO, JSON.stringify(todo)); } catch(e){}
+  todoShow = 12;
+  btn.disabled = false; btn.textContent = 'Refresh';
+  renderTodo(); renderMap();
+  if (!todo.items.length) toast(notes.length ? notes[0] : 'Nothing found out there');
+}
+
+function todoList(){
+  return todo.items
+    .filter(c => !isVisited(c) && !isSkipped(c))
+    .map(c => Object.assign({}, c, {dist: haversine(CASTLE, c)}))
+    .sort((a, b) => a.dist - b.dist);
+}
+
+function renderTodo(){
+  const arr = todoList();
+  const shown = arr.slice(0, todoShow);
+  $('#todoCount').textContent = arr.length ? arr.length + ' to try · nearest the castle first' : '';
+  $('#todoMapToggle').textContent = ui.todoOnMap === false ? 'Show grey pins' : 'Hide grey pins';
+
+  if (todo.fetched){
+    const skipped = (data.skip || []).length;
+    $('#todoWhen').textContent = 'checked ' + todo.fetched.slice(0,10)
+      + (skipped ? ' · ' + skipped + ' set aside' : '')
+      + ((todo.notes && todo.notes.length) ? ' · ' + todo.notes.join('; ') : '');
+  }
+
+  if (!arr.length){
+    $('#todoList').innerHTML = todo.fetched
+      ? '<div class="empty">Nothing left within that radius — widen it, or you have been to them all.</div>'
+      : '<div class="empty">Tap <b>Find cafés near Castell Coch</b> and every café in range that you haven’t rated yet turns up here, closest to the castle first.</div>';
+    return;
+  }
+
+  $('#todoList').innerHTML = shown.map((c, i) => `<div class="todorow" data-key="${esc(candKey(c))}">
+      <div class="tr">${i+1}</div>
+      <div>
+        <div class="tn">${esc(c.name)}</div>
+        <div class="td">${esc(c.address || 'no address on file')}</div>
+        <div style="margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <span class="dist">${km(c.dist)} from the castle</span>
+          ${c.rating ? `<span class="chip">G ${c.rating.toFixed(1)}${c.count ? ' · ' + c.count : ''}</span>` : ''}
+          <span class="srcdot">${c.src === 'both' ? 'OSM + Google' : c.src === 'google' ? 'Google' : 'OpenStreetMap'}</span>
+        </div>
+      </div>
+      <div class="ta">
+        <button class="btn sm" data-todo="rate">Rate it</button>
+        <button class="icon-btn" data-todo="map" aria-label="Show on map">📍</button>
+        <button class="icon-btn" data-todo="skip" aria-label="Not for me">✕</button>
+      </div>
+    </div>`).join('')
+    + (arr.length > shown.length ? `<div style="padding:12px 14px;text-align:center"><button class="btn sm" id="todoMore">Show ${Math.min(20, arr.length - shown.length)} more of ${arr.length}</button></div>` : '');
+
+  const more = $('#todoMore');
+  if (more) more.onclick = () => { todoShow += 20; renderTodo(); };
+}
+
 /* ---------- data shaping ---------- */
 function forRepo(){
   const c = JSON.parse(JSON.stringify(data));
@@ -1108,7 +1327,7 @@ function forRepo(){
 }
 
 function normalise(d){
-  const out = {version:1, title:'Izzies Coffee Shops', updated:d.updated||null, shops:[]};
+  const out = {version:1, title:'Izzies Coffee Shops', updated:d.updated||null, shops:[], skip: Array.isArray(d.skip) ? d.skip.slice() : []};
   out.shops = (d.shops||[]).map(s => ({
     id: s.id || slug(s.name||'shop'),
     name: s.name || 'Untitled',
@@ -1254,7 +1473,7 @@ function dirLabel(){
 }
 
 /* ---------- rendering ---------- */
-function renderAll(){ renderPodium(); renderList(); renderMap(); dirLabel(); }
+function renderAll(){ renderPodium(); renderList(); renderTodo(); renderMap(); dirLabel(); }
 
 function renderPodium(){
   const top = data.shops.slice().sort(byScore).slice(0,3);
@@ -1442,6 +1661,22 @@ function renderMap(){
     m._shopId = s.id;
     pts.push([s.lat, s.lng]);
   });
+  // Castell Coch, the point everything to-try is measured from
+  L.marker([CASTLE.lat, CASTLE.lng], {
+    icon: L.divIcon({html:'<div class="pin castle"><span>\u{1F3F0}</span></div>', className:'', iconSize:[38,38], iconAnchor:[19,19], popupAnchor:[0,-18]}),
+    zIndexOffset: -200
+  }).addTo(markerLayer).bindPopup('<div class="pop"><b>Castell Coch</b><br>everything in <i>Still to try</i> is ranked by distance from here</div>');
+
+  // cafes you haven't rated yet
+  if (ui.todoOnMap !== false){
+    todoList().slice(0, 60).forEach((c, i) => {
+      const icon = L.divIcon({html:`<div class="pin todo"><span>${i+1}</span></div>`, className:'', iconSize:[26,26], iconAnchor:[13,25], popupAnchor:[0,-23]});
+      const m = L.marker([c.lat, c.lng], {icon, zIndexOffset:-100}).addTo(markerLayer);
+      m.bindPopup(`<div class="pop"><b>${esc(c.name)}</b><br>not rated yet · ${km(c.dist)} from the castle${c.rating ? ' · G '+c.rating.toFixed(1) : ''}<br>${esc(c.address||'')}<br><a href="#" data-ratecand="${esc(candKey(c))}">Rate this one \u2192</a></div>`);
+      m._candKey = candKey(c);
+    });
+  }
+
   const missing = data.shops.filter(s => s.lat == null).length;
   $('#mapCount').textContent = pts.length + ' pinned' + (missing ? ' · ' + missing + ' without a pin' : '');
   if (pts.length){
@@ -1456,6 +1691,15 @@ function focusShop(id){
   if (!ensureMap()) return;
   map.setView([s.lat, s.lng], 17, {animate:true});
   markerLayer.eachLayer(m => { if (m._shopId === id) m.openPopup(); });
+  $('#mapPanel').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function focusCandidate(key){
+  if (!ui.mapOpen){ ui.mapOpen = true; applyMapVisibility(); renderMap(); }
+  if (!ensureMap()) return;
+  const c = todoList().find(x => candKey(x) === key);
+  if (!c) return;
+  map.setView([c.lat, c.lng], 17, {animate:true});
+  markerLayer.eachLayer(m => { if (m._candKey === key) m.openPopup(); });
   $('#mapPanel').scrollIntoView({behavior:'smooth', block:'center'});
 }
 function applyMapVisibility(){
@@ -1492,15 +1736,16 @@ function writeRates(scores){
     row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === v)));
   });
 }
-function openEdit(id){
+function openEdit(id, prefill){
   editingId = id || null;
   const s = id ? data.shops.find(x => x.id === id) : null;
-  $('#editTitle').firstChild.nodeValue = s ? '✎ Edit shop ' : '☕ Add a coffee shop ';
-  $('#fName').value = s ? s.name : '';
-  $('#fAddr').value = s ? s.address : '';
+  $('#editTitle').firstChild.nodeValue = s ? '✎ Edit shop ' : (prefill ? '☕ Rate this one ' : '☕ Add a coffee shop ');
+  $('#fName').value = s ? s.name : (prefill ? prefill.name : '');
+  $('#fAddr').value = s ? s.address : (prefill ? (prefill.address || '') : '');
   $('#fComments').value = s ? s.comments : '';
   writeRates(s ? s.scores : {});
-  pickLL = (s && s.lat != null) ? {lat:s.lat, lng:s.lng} : null;
+  pickLL = (s && s.lat != null) ? {lat:s.lat, lng:s.lng}
+         : (prefill && prefill.lat != null) ? {lat:prefill.lat, lng:prefill.lng} : null;
   $('#geoResults').hidden = true; $('#geoResults').innerHTML = '';
   $('#deleteShop').hidden = !s;
   $('#editBack').hidden = false;
@@ -1607,6 +1852,12 @@ function boot(){
   $('#sortBy').value = ui.sortBy;
   $('#search').value = '';
   applyMapVisibility();
+  try {
+    const t = JSON.parse(localStorage.getItem(LS_TODO) || 'null');
+    if (t && Array.isArray(t.items)) todo = t;
+  } catch(e){}
+  $('#todoRadius').value = String(todo.radius || 10000);
+  if (todo.fetched) $('#todoFind').textContent = 'Refresh';
   renderAll();
   refreshStatus();
 
@@ -1624,6 +1875,39 @@ function boot(){
   $('#sortDir').addEventListener('click', () => { ui.dir = ui.dir==='asc'?'desc':'asc'; saveUI(); renderList(); dirLabel(); });
   $('#mapToggle').addEventListener('click', () => { ui.mapOpen = !ui.mapOpen; applyMapVisibility(); if (ui.mapOpen) renderMap(); });
   $('#addBtn').addEventListener('click', () => openEdit(null));
+
+  /* still to try */
+  $('#todoFind').addEventListener('click', () => findNearby(Number($('#todoRadius').value)));
+  $('#todoRadius').addEventListener('change', e => {
+    todo.radius = Number(e.target.value);
+    try { localStorage.setItem(LS_TODO, JSON.stringify(todo)); } catch(err){}
+    if (todo.fetched) toast('Tap Refresh to search the new radius');
+  });
+  $('#todoMapToggle').addEventListener('click', () => {
+    ui.todoOnMap = ui.todoOnMap === false; saveUI(); renderTodo(); renderMap();
+  });
+  $('#todoList').addEventListener('click', e => {
+    const btn = e.target.closest('[data-todo]');
+    if (!btn) return;
+    const key = e.target.closest('.todorow').dataset.key;
+    const c = todoList().find(x => candKey(x) === key);
+    if (!c) return;
+    const act = btn.dataset.todo;
+    if (act === 'rate') openEdit(null, c);
+    else if (act === 'map') focusCandidate(key);
+    else if (act === 'skip'){
+      data.skip = (data.skip || []).concat([key]);
+      markDirty(); renderTodo(); renderMap();
+      toast('Set aside — undo with “Bring back” in ⚙︎ Sync');
+    }
+  });
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-ratecand]');
+    if (!a) return;
+    e.preventDefault();
+    const c = todoList().find(x => candKey(x) === a.getAttribute('data-ratecand'));
+    if (c) openEdit(null, c);
+  });
   $('#addBtn2').addEventListener('click', () => openEdit(null));
   $('#dtEdit').addEventListener('click', () => { const id = detailId; closeModal('detailBack'); openEdit(id); });
   $('#dtMap').addEventListener('click', () => { const id = detailId; closeModal('detailBack'); focusShop(id); });
@@ -1780,6 +2064,12 @@ function boot(){
   });
 
   /* backups */
+  $('#unskipBtn').addEventListener('click', () => {
+    const n = (data.skip || []).length;
+    if (!n){ toast('Nothing has been set aside'); return; }
+    data.skip = []; markDirty(); renderTodo(); renderMap();
+    toast(n + (n === 1 ? ' café is back on the list' : ' cafés are back on the list'));
+  });
   $('#expJson').addEventListener('click', () => download('data.json', JSON.stringify(forRepo(), null, 2)));
   $('#expCsv').addEventListener('click',  () => download('izzies-coffee-shops.csv', toCsv(), 'text/csv'));
   $('#impBtn').addEventListener('click',  () => $('#impFile').click());
