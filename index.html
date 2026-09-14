@@ -472,7 +472,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
     <a class="dad" href="https://stuartmcneil.github.io/window/" target="_blank" rel="noopener"><span class="cupicon">☕</span>DAD</a>
   </div>
 
-  <footer class="foot">Izzies Coffee Shops · scores are the mean of nine categories · map data © OpenStreetMap contributors</footer>
+  <footer class="foot">Izzies Coffee Shops · scores are the mean of nine categories · map data © OpenStreetMap contributors · <span id="buildStamp"></span></footer>
 </div>
 
 <!-- ============ edit modal ============ -->
@@ -591,6 +591,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
 /* ============================================================
    Izzies Coffee Shops — single-file app
    ============================================================ */
+const BUILD = '2026-09-14b';
 const CRITERIA = [
   {key:'atmosphere',   label:'Atmosphere'},
   {key:'price',        label:'Price'},
@@ -1314,7 +1315,7 @@ async function findNearby(radius){
     items: mergeCandidates(goo, osm),
     notes
   };
-  try { localStorage.setItem(LS_TODO, JSON.stringify(todo)); } catch(e){}
+  try { localStorage.setItem(LS_TODO, JSON.stringify(Object.assign({}, todo, {notes: undefined}))); } catch(e){}
   todoShow = 12;
   btn.disabled = false; btn.textContent = 'Refresh';
   renderTodo(); renderMap();
@@ -1956,6 +1957,7 @@ function boot(){
   data = normalise(local && Array.isArray(local.shops) && local.shops.length ? local : SEED);
   saveLocal();
 
+  const bs = $('#buildStamp'); if (bs) bs.textContent = 'build ' + BUILD;
   sortOptions();
   buildRates();
   $('#sortBy').value = ui.sortBy;
@@ -1963,7 +1965,7 @@ function boot(){
   applyMapVisibility();
   try {
     const t = JSON.parse(localStorage.getItem(LS_TODO) || 'null');
-    if (t && Array.isArray(t.items)) todo = t;
+    if (t && Array.isArray(t.items)){ delete t.notes; todo = t; }
   } catch(e){}
   $('#todoRadius').value = String(todo.radius || 10000);
   if (todo.fetched) $('#todoFind').textContent = 'Refresh';
