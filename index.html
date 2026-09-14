@@ -592,7 +592,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
 /* ============================================================
    Izzies Coffee Shops — single-file app
    ============================================================ */
-const BUILD = '2026-09-14c';
+const BUILD = '2026-09-14d';
 const CRITERIA = [
   {key:'atmosphere',   label:'Atmosphere'},
   {key:'price',        label:'Price'},
@@ -1310,11 +1310,13 @@ async function findNearby(radius){
     goo = prev.filter(c => c.src === 'google' || c.src === 'both');
     notes.push('Google lookup failed (' + rg.reason.message + ')' + (goo.length ? ' — kept the previous results' : ''));
   }
-  const anyFresh = ro.status === 'fulfilled' || rg.status === 'fulfilled';
+  const googleRan = !!cfg.mapsKey;
+  const anyFresh = ro.status === 'fulfilled' || (googleRan && rg.status === 'fulfilled');
   todo = {
     fetched: anyFresh ? new Date().toISOString() : todo.fetched,
     radius,
     items: mergeCandidates(goo, osm),
+    failed: !anyFresh,
     notes
   };
   try { localStorage.setItem(LS_TODO, JSON.stringify(Object.assign({}, todo, {notes: undefined}))); } catch(e){}
@@ -1338,17 +1340,21 @@ function renderTodo(){
   $('#todoCount').textContent = arr.length ? arr.length + ' to try · nearest the castle first' : '';
   $('#todoMapToggle').textContent = ui.todoOnMap === false ? 'Show grey pins' : 'Hide grey pins';
 
+  if (todo.failed && !todo.fetched) $('#todoWhen').textContent = '';
   if (todo.fetched){
     const skipped = (data.skip || []).length;
-    $('#todoWhen').textContent = 'checked ' + todo.fetched.slice(0,10)
+    $('#todoWhen').textContent = (todo.failed ? 'last good check ' : 'checked ') + todo.fetched.slice(0,10)
       + (skipped ? ' · ' + skipped + ' set aside' : '')
       + ((todo.notes && todo.notes.length) ? ' · ' + todo.notes.join('; ') : '');
   }
 
   if (!arr.length){
-    $('#todoList').innerHTML = todo.fetched
-      ? '<div class="empty">Nothing left within that radius — widen it, or you have been to them all.</div>'
-      : '<div class="empty">Tap <b>Find cafés near Castell Coch</b> and every café in range that you haven’t rated yet turns up here, closest to the castle first.</div>';
+    $('#todoList').innerHTML =
+      todo.failed
+        ? '<div class="empty"><b>The lookup didn’t get through.</b><br>' + esc((todo.notes || ['The search failed.'])[0]) + '<br>Nothing is being hidden — there is simply no result to show yet. The OpenStreetMap servers are shared and usually free up within a few minutes, so try again shortly.</div>'
+        : todo.fetched
+          ? '<div class="empty">Nothing left within that radius — widen it, or you have been to them all.</div>'
+          : '<div class="empty">Tap <b>Find cafés near Castell Coch</b> and every café in range that you haven’t rated yet turns up here, closest to the castle first.</div>';
     return;
   }
 
