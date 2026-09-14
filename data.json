@@ -1,7 +1,7 @@
 {
   "version": 1,
   "title": "Izzies Coffee Shops",
-  "updated": "2026-09-14T11:55:39.037Z",
+  "updated": "2026-09-14T11:55:52.739Z",
   "shops": [
     {
       "id": "asda-croyton",
@@ -432,7 +432,7 @@
         "price": 5,
         "taste": 4,
         "cakes": 4,
-        "idiots": 3,
+        "idiots": 4,
         "food": 3,
         "parking": 2,
         "views": 4,
