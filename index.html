@@ -425,6 +425,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
 
   <section class="panel" id="mapPanel">
     <h2>📍 Where they are <span class="count" id="mapCount"></span>
+      <button class="btn sm" id="fitAll" style="margin-left:10px">Fit all</button>
       <select id="tileStyle" class="tilesel" aria-label="Map style"></select>
     </h2>
     <div style="position:relative"><div id="map"></div><div class="tilewarn" id="tileWarn" hidden></div></div>
@@ -591,7 +592,7 @@ footer.foot{text-align:center;font-size:12px;color:var(--foam);opacity:.72;paddi
 /* ============================================================
    Izzies Coffee Shops — single-file app
    ============================================================ */
-const BUILD = '2026-09-14b';
+const BUILD = '2026-09-14c';
 const CRITERIA = [
   {key:'atmosphere',   label:'Atmosphere'},
   {key:'price',        label:'Price'},
@@ -1051,6 +1052,7 @@ let cfg  = {owner:'', repo:'', branch:'main', path:'data.json', token:'', mapsKe
 let ui   = {sortBy:'overall', dir:'desc', mapOpen:true, expanded:{}};
 let remoteSha = null, dirty = false, saveTimer = null, editingId = null;
 let map, markerLayer, pickMap, pickMarker, pickLL = null;
+let userMoved = false, autoFitting = false;
 
 /* ---------- helpers ---------- */
 const $  = s => document.querySelector(s);
@@ -1754,6 +1756,7 @@ function ensureMap(){
   addTiles(map, true);
   markerLayer = L.layerGroup().addTo(map);
   map.on('click', ()=> map.scrollWheelZoom.enable());
+  map.on('dragend zoomend', () => { if (!autoFitting) userMoved = true; });
   return true;
 }
 function renderMap(){
@@ -1778,19 +1781,30 @@ function renderMap(){
   }).addTo(markerLayer).bindPopup('<div class="pop"><b>Castell Coch</b><br>everything in <i>Still to try</i> is ranked by distance from here</div>');
 
   // cafes you haven't rated yet
+  const todoPts = [];
   if (ui.todoOnMap !== false){
     todoList().slice(0, 60).forEach((c, i) => {
       const icon = L.divIcon({html:`<div class="pin todo"><span>${i+1}</span></div>`, className:'', iconSize:[26,26], iconAnchor:[13,25], popupAnchor:[0,-23]});
       const m = L.marker([c.lat, c.lng], {icon, zIndexOffset:-100}).addTo(markerLayer);
+      todoPts.push([c.lat, c.lng]);
       m.bindPopup(`<div class="pop"><b>${esc(c.name)}</b><br>not rated yet · ${km(c.dist)} from the castle${c.rating ? ' · G '+c.rating.toFixed(1) : ''}<br>${esc(c.address||'')}<br><a href="#" data-ratecand="${esc(candKey(c))}">Rate this one \u2192</a></div>`);
       m._candKey = candKey(c);
     });
   }
 
   const missing = data.shops.filter(s => s.lat == null).length;
-  $('#mapCount').textContent = pts.length + ' pinned' + (missing ? ' · ' + missing + ' without a pin' : '');
-  if (pts.length){
-    map.fitBounds(L.latLngBounds(pts).pad(0.25), {maxZoom: 15});
+  const hiddenTodo = (ui.todoOnMap === false) ? todoList().length : 0;
+  $('#mapCount').textContent = pts.length + ' pinned'
+    + (missing ? ' · ' + missing + ' without a pin' : '')
+    + (todoPts.length ? ' · ' + todoPts.length + ' to try' : '')
+    + (hiddenTodo ? ' · ' + hiddenTodo + ' to try hidden' : '');
+
+  const all = pts.concat(todoPts);
+  if (todoPts.length) all.push([CASTLE.lat, CASTLE.lng]);
+  if (all.length && !userMoved){
+    autoFitting = true;
+    map.fitBounds(L.latLngBounds(all).pad(0.12), {maxZoom: 15});
+    setTimeout(()=>{ autoFitting = false; }, 400);
   }
   setTimeout(()=> map.invalidateSize(), 60);
 }
@@ -1799,6 +1813,7 @@ function focusShop(id){
   if (!s || s.lat == null) return;
   if (!ui.mapOpen){ ui.mapOpen = true; applyMapVisibility(); renderMap(); }
   if (!ensureMap()) return;
+  userMoved = true;
   map.setView([s.lat, s.lng], 17, {animate:true});
   markerLayer.eachLayer(m => { if (m._shopId === id) m.openPopup(); });
   $('#mapPanel').scrollIntoView({behavior:'smooth', block:'center'});
@@ -1808,6 +1823,7 @@ function focusCandidate(key){
   if (!ensureMap()) return;
   const c = todoList().find(x => candKey(x) === key);
   if (!c) return;
+  userMoved = true;
   map.setView([c.lat, c.lng], 17, {animate:true});
   markerLayer.eachLayer(m => { if (m._candKey === key) m.openPopup(); });
   $('#mapPanel').scrollIntoView({behavior:'smooth', block:'center'});
@@ -1992,6 +2008,7 @@ function boot(){
   }
   $('#tileStyle').innerHTML = TILE_SOURCES.map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
   $('#tileStyle').value = tileSource().id;
+  $('#fitAll').addEventListener('click', () => { userMoved = false; renderMap(); });
   $('#tileStyle').addEventListener('change', e => { ui.tiles = e.target.value; saveUI(); retileAll(); });
   $('#mapToggle').addEventListener('click', () => { ui.mapOpen = !ui.mapOpen; applyMapVisibility(); if (ui.mapOpen) renderMap(); });
   $('#addBtn').addEventListener('click', () => openEdit(null));

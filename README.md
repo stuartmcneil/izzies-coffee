@@ -77,6 +77,8 @@ Results are merged: where both know the same place, Google's name, address and r
 
 Per row: **Rate it** opens the add form with the name, address and map pin already filled in; **📍** jumps to it on the map; **✕** sets it aside for good. Set-aside cafés sync across your devices in `data.json`, and **⚙︎ Sync → Bring back set-aside cafés** undoes the lot.
 
+The map frames everything it is showing — your shops, the grey pins and the castle — but stops re-framing once you pan or zoom, so it won't yank the view back while you're looking around. **Fit all** in the *Where they are* header returns to the whole picture. The header count also tells you how many to-try pins are on the map, or how many are hidden if you've toggled them off.
+
 The radius selector runs 3–15 km; 10 km is the default and reaches most of Cardiff. The map shows the nearest 60, the list shows 12 at a time. Results are cached in the browser, so the panel is still populated next time you open the page without spending another lookup.
 
 ## Using it
