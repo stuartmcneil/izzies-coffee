@@ -70,7 +70,7 @@ The **Still to try** panel finds cafés you haven't rated yet and ranks them by 
 
 Tap **Find cafés near Castell Coch** and it asks two sources at once:
 
-- **OpenStreetMap** (via the Overpass API) — free, no key, no quota. Covers the whole radius. Volunteer-maintained, so a brand-new place may be missing and some entries have no address.
+- **OpenStreetMap** (via the Overpass API) — free, no key, no quota. Covers the whole radius. Volunteer-maintained, so a brand-new place may be missing and some entries have no address. The Overpass servers are shared and often overloaded; a **504** or **429** just means busy, so the page works down four mirrors before giving up, and a failed refresh keeps the results you already had rather than emptying the list.
 - **Google Places** — only if you've set a key. Returns the 20 closest, with proper business names and star ratings. It costs a Places search against your quota each time you refresh.
 
 Results are merged: where both know the same place, Google's name, address and rating win and the row is tagged *OSM + Google*. Anything already in your list is filtered out automatically — by position (within 120 m) or by matching name nearby — so rating a place makes it disappear from *Still to try* on its own.

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "title": "Izzies Coffee Shops",
-  "updated": "2026-09-14T11:23:06.631Z",
+  "updated": "2026-09-01T12:00:00Z",
   "shops": [
     {
       "id": "asda-croyton",
@@ -21,7 +21,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "969277",
         "rating": "4",
@@ -34,8 +36,7 @@
         },
         "matchedName": "Eurest @ Asda",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "coffee-club-whitchurch",
@@ -55,9 +56,10 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
-      "fsa": null,
-      "google": null
+      "google": null,
+      "fsa": null
     },
     {
       "id": "coffee-no-1-whitchurch",
@@ -77,7 +79,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1200837",
         "rating": "5",
@@ -90,8 +94,7 @@
         },
         "matchedName": "Coffee#1",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "ground",
@@ -111,9 +114,10 @@
         "friendliness": 5
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
-      "fsa": null,
-      "google": null
+      "google": null,
+      "fsa": null
     },
     {
       "id": "fino-lounge",
@@ -133,7 +137,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "969284",
         "rating": "5",
@@ -146,8 +152,7 @@
         },
         "matchedName": "Fino Lounge Cafe/Bar",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "against-the-grain",
@@ -167,7 +172,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1492976",
         "rating": "5",
@@ -180,8 +187,7 @@
         },
         "matchedName": "Against The Grain Coffee House LTD",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "pink-kiwi",
@@ -201,7 +207,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1320642",
         "rating": "3",
@@ -214,8 +222,7 @@
         },
         "matchedName": "Pink Kiwi",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "blossom",
@@ -235,7 +242,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1174574",
         "rating": "5",
@@ -248,8 +257,7 @@
         },
         "matchedName": "Blossom",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "wellfield-social",
@@ -269,7 +277,9 @@
         "friendliness": 4
       },
       "comments": "12.6",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1738733",
         "rating": "4",
@@ -282,8 +292,7 @@
         },
         "matchedName": "The Wellfield Social",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "the-coffi-house",
@@ -303,7 +312,9 @@
         "friendliness": 4
       },
       "comments": "11.3",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1949044",
         "rating": "AwaitingInspection",
@@ -316,8 +327,7 @@
         },
         "matchedName": "The coffi house",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "bentleys-cafe",
@@ -337,7 +347,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1269190",
         "rating": "5",
@@ -350,8 +362,7 @@
         },
         "matchedName": "Bentley's Cafe Ltd",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "ty-melin-bakery",
@@ -371,7 +382,9 @@
         "friendliness": 4
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1419414",
         "rating": "5",
@@ -384,8 +397,7 @@
         },
         "matchedName": "Ty Melin Bakery",
         "fetched": "2026-09-01"
-      },
-      "google": null
+      }
     },
     {
       "id": "a-head-of-the-game",
@@ -405,7 +417,9 @@
         "friendliness": 1
       },
       "comments": "",
+      "visited": "",
       "added": "2026-09-01",
+      "google": null,
       "fsa": {
         "id": "1837642",
         "rating": "5",
@@ -418,29 +432,7 @@
         },
         "matchedName": "A-Head of the Game Nutrition",
         "fetched": "2026-09-01"
-      },
-      "google": null
-    },
-    {
-      "name": "Coffi Lab",
-      "address": "10 Heol y Deri Cardiff CF14 6HG",
-      "lat": 51.523072,
-      "lng": -3.212393,
-      "scores": {
-        "atmosphere": 4,
-        "price": 5,
-        "taste": 4,
-        "cakes": 4,
-        "idiots": 4,
-        "food": 3,
-        "parking": 2,
-        "views": 4,
-        "friendliness": 4
-      },
-      "comments": "",
-      "id": "coffi-lab",
-      "added": "2026-09-14"
+      }
     }
-  ],
-  "skip": []
+  ]
 }

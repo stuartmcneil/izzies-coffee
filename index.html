@@ -1198,16 +1198,15 @@ function isVisited(c){
 }
 function isSkipped(c){ return (data.skip || []).includes(candKey(c)); }
 
-async function fetchOsm(radius){
-  const around = `(around:${radius},${CASTLE.lat},${CASTLE.lng})`;
-  const q = `[out:json][timeout:25];(nwr["amenity"="cafe"]${around};nwr["shop"="coffee"]${around};);out center tags 500;`;
-  const r = await fetch('https://overpass-api.de/api/interpreter', {
-    method:'POST',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:'data=' + encodeURIComponent(q)
-  });
-  if (!r.ok) throw new Error('OpenStreetMap returned ' + r.status);
-  const j = await r.json();
+/* The public Overpass servers are shared and frequently overloaded — 429 and 504
+   are routine. Work down the mirror list before giving up. */
+const OVERPASS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.osm.ch/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter'
+];
+function osmParse(j){
   return (j.elements || []).map(e => {
     const lat = (e.lat != null) ? e.lat : (e.center && e.center.lat);
     const lng = (e.lon != null) ? e.lon : (e.center && e.center.lon);
@@ -1216,6 +1215,28 @@ async function fetchOsm(radius){
     const addr = [t['addr:housenumber'], t['addr:street'], t['addr:suburb'] || t['addr:city'], t['addr:postcode']].filter(Boolean).join(' ');
     return {src:'osm', id:'osm-'+e.type+'-'+e.id, name:t.name, address:addr, lat, lng};
   }).filter(Boolean);
+}
+async function fetchOsm(radius){
+  const around = `(around:${radius},${CASTLE.lat},${CASTLE.lng})`;
+  const q = `[out:json][timeout:60];(nwr["amenity"="cafe"]${around};nwr["shop"="coffee"]${around};);out center tags 500;`;
+  let last = 'no servers tried';
+  for (let i = 0; i < OVERPASS.length; i++){
+    if (i) $('#todoWhen').textContent = 'First OpenStreetMap server was busy — trying mirror ' + i + '…';
+    try{
+      const r = await fetch(OVERPASS[i], {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'data=' + encodeURIComponent(q)
+      });
+      if (r.ok) return osmParse(await r.json());
+      last = (r.status === 504 || r.status === 429 || r.status === 503)
+        ? 'busy (' + r.status + ')'
+        : 'returning ' + r.status;
+    }catch(e){
+      last = 'unreachable';
+    }
+  }
+  throw new Error('every server was ' + last);
 }
 
 async function fetchGoogleNearby(radius){
@@ -1271,12 +1292,24 @@ async function findNearby(radius){
   const btn = $('#todoFind');
   btn.disabled = true; btn.textContent = 'Looking…';
   $('#todoWhen').textContent = cfg.mapsKey ? 'Asking OpenStreetMap and Google…' : 'Asking OpenStreetMap…';
+  const prev = todo.items || [];
   let osm = [], goo = [], notes = [];
   const [ro, rg] = await Promise.allSettled([fetchOsm(radius), fetchGoogleNearby(radius)]);
-  if (ro.status === 'fulfilled') osm = ro.value; else notes.push('OpenStreetMap lookup failed (' + ro.reason.message + ')');
-  if (rg.status === 'fulfilled') goo = rg.value; else notes.push('Google lookup failed (' + rg.reason.message + ')');
+  if (ro.status === 'fulfilled'){
+    osm = ro.value;
+  } else {
+    osm = prev.filter(c => c.src === 'osm' || c.src === 'both');
+    notes.push('OpenStreetMap: ' + ro.reason.message + (osm.length ? ' — kept the ' + osm.length + ' from last time' : ''));
+  }
+  if (rg.status === 'fulfilled'){
+    goo = rg.value;
+  } else {
+    goo = prev.filter(c => c.src === 'google' || c.src === 'both');
+    notes.push('Google lookup failed (' + rg.reason.message + ')' + (goo.length ? ' — kept the previous results' : ''));
+  }
+  const anyFresh = ro.status === 'fulfilled' || rg.status === 'fulfilled';
   todo = {
-    fetched: new Date().toISOString(),
+    fetched: anyFresh ? new Date().toISOString() : todo.fetched,
     radius,
     items: mergeCandidates(goo, osm),
     notes
@@ -1286,6 +1319,7 @@ async function findNearby(radius){
   btn.disabled = false; btn.textContent = 'Refresh';
   renderTodo(); renderMap();
   if (!todo.items.length) toast(notes.length ? notes[0] : 'Nothing found out there');
+  else if (notes.length) toast(notes[0], 5000);
 }
 
 function todoList(){
