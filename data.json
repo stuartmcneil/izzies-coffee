@@ -1,7 +1,7 @@
 {
   "version": 1,
   "title": "Izzies Coffee Shops",
-  "updated": "2026-09-14T11:54:13.789Z",
+  "updated": "2026-09-14T11:55:39.037Z",
   "shops": [
     {
       "id": "asda-croyton",
@@ -422,13 +422,14 @@
       "google": null
     },
     {
+      "id": "coffi-lab",
       "name": "Coffi Lab",
       "address": "10 Heol y Deri Cardiff CF14 6HG",
       "lat": 51.523072,
       "lng": -3.212393,
       "scores": {
         "atmosphere": 4,
-        "price": 4,
+        "price": 5,
         "taste": 4,
         "cakes": 4,
         "idiots": 3,
@@ -438,8 +439,9 @@
         "friendliness": 4
       },
       "comments": "",
-      "id": "coffi-lab",
-      "added": "2026-09-14"
+      "added": "2026-09-14",
+      "fsa": null,
+      "google": null
     }
   ],
   "skip": []
