@@ -1,7 +1,7 @@
 {
   "version": 1,
   "title": "Izzies Coffee Shops",
-  "updated": "2026-09-14T11:55:52.739Z",
+  "updated": "2026-10-24T10:27:55.174Z",
   "shops": [
     {
       "id": "asda-croyton",
@@ -442,6 +442,26 @@
       "added": "2026-09-14",
       "fsa": null,
       "google": null
+    },
+    {
+      "name": "Esquires Coffee",
+      "address": "Nantgarw Road Caerphilly CF83 1SN",
+      "lat": 51.571035,
+      "lng": -3.241839,
+      "scores": {
+        "atmosphere": 4,
+        "price": 3,
+        "taste": 4,
+        "cakes": 4,
+        "idiots": 4,
+        "food": 4,
+        "parking": 5,
+        "views": 3,
+        "friendliness": 3
+      },
+      "comments": "",
+      "id": "esquires-coffee",
+      "added": "2026-10-24"
     }
   ],
   "skip": []
